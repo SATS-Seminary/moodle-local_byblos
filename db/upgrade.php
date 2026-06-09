@@ -192,5 +192,72 @@ function xmldb_local_byblos_upgrade(int $oldversion): bool {
         upgrade_plugin_savepoint(true, 2026042100, 'local', 'byblos');
     }
 
+    if ($oldversion < 2026060701) {
+        // Create local_byblos_goal (first-class learning-goal store).
+        $table = new xmldb_table('local_byblos_goal');
+        if (!$dbman->table_exists($table)) {
+            $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE);
+            $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+            $table->add_field('title', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL);
+            $table->add_field('description', XMLDB_TYPE_TEXT, null, null, null);
+            $table->add_field('status', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, 'active');
+            $table->add_field('targetdate', XMLDB_TYPE_INTEGER, '10', null, null);
+            $table->add_field('progress', XMLDB_TYPE_INTEGER, '3', null, XMLDB_NOTNULL, null, '0');
+            $table->add_field('sortorder', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+            $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+            $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+            $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+            $table->add_key('fk_userid', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
+            $table->add_index('ix_userid_status', XMLDB_INDEX_NOTUNIQUE, ['userid', 'status']);
+            $table->add_index('ix_userid_sort', XMLDB_INDEX_NOTUNIQUE, ['userid', 'sortorder']);
+            $dbman->create_table($table);
+        }
+
+        // Create local_byblos_goal_link (evidence citations for a goal).
+        $table = new xmldb_table('local_byblos_goal_link');
+        if (!$dbman->table_exists($table)) {
+            $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE);
+            $table->add_field('goalid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+            $table->add_field('linktype', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL);
+            $table->add_field('linkid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+            $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+            $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+            $table->add_key('fk_goalid', XMLDB_KEY_FOREIGN, ['goalid'], 'local_byblos_goal', ['id']);
+            $table->add_index('uix_goal_link', XMLDB_INDEX_UNIQUE, ['goalid', 'linktype', 'linkid']);
+            $dbman->create_table($table);
+        }
+
+        upgrade_plugin_savepoint(true, 2026060701, 'local', 'byblos');
+    }
+
+    if ($oldversion < 2026060702) {
+        // Add feedback-mode column to local_byblos_page.
+        $table = new xmldb_table('local_byblos_page');
+        $field = new xmldb_field('feedback', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, 'off', 'status');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Create local_byblos_pagefeedback (logged-in, owner-moderated page feedback).
+        $table = new xmldb_table('local_byblos_pagefeedback');
+        if (!$dbman->table_exists($table)) {
+            $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE);
+            $table->add_field('pageid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+            $table->add_field('authorid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+            $table->add_field('authorrole', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, 'peer');
+            $table->add_field('body', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL);
+            $table->add_field('visible', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1');
+            $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+            $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+            $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+            $table->add_key('fk_pageid', XMLDB_KEY_FOREIGN, ['pageid'], 'local_byblos_page', ['id']);
+            $table->add_key('fk_authorid', XMLDB_KEY_FOREIGN, ['authorid'], 'user', ['id']);
+            $table->add_index('ix_pageid_visible', XMLDB_INDEX_NOTUNIQUE, ['pageid', 'visible']);
+            $dbman->create_table($table);
+        }
+
+        upgrade_plugin_savepoint(true, 2026060702, 'local', 'byblos');
+    }
+
     return true;
 }

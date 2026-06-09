@@ -1,0 +1,93 @@
+{{!
+    @template local_byblos/docs/getting_started
+
+    Guide: orientation, reaching the dashboard and the core concepts.
+
+    Context variables:
+    - links (object) Map of topic key => URL.
+    - dashurl (string) Portfolio dashboard URL.
+    - newpageurl (string) New-page wizard URL.
+
+    @package    local_byblos
+    @copyright  2026 South African Theological Seminary
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+        "dashurl": "#",
+        "newpageurl": "#",
+        "pix": {"usermenu": "#", "portfolio_dashboard": "#"},
+        "links": {
+            "index": "#", "getting_started": "#", "building_pages": "#",
+            "publishing": "#", "collections": "#", "goals": "#", "sharing": "#",
+            "assessment": "#", "usecase_programme": "#", "usecase_course": "#",
+            "usecase_professional": "#"
+        }
+    }
+}}
+<div class="byblos-docs-article">
+
+    <h1>{{#str}}docs_topic_getting_started, local_byblos{{/str}}</h1>
+    <p class="byblos-docs-lead">
+        This guide shows you where Byblos lives in Moodle and explains the handful of
+        ideas you need before you build anything.
+    </p>
+
+    <h2>Opening your portfolio</h2>
+    <ol class="byblos-docs-steps">
+        <li>Open the <strong>user menu</strong> (your name or avatar, top-right of any page).</li>
+        <li>Choose <strong>{{#str}}nav_myportfolio, local_byblos{{/str}}</strong>.</li>
+        <li>You land on your <strong>dashboard</strong>: the home base for everything in Byblos.
+            You can return here any time from the same menu, or jump straight to
+            <a href="{{{dashurl}}}">your portfolio dashboard</a>.</li>
+    </ol>
+
+    <figure class="byblos-docs-figure">
+        <img src="{{pix.usermenu}}" class="byblos-docs-img byblos-docs-img-tall" loading="lazy"
+             alt="The Moodle user menu open, with the My Portfolio item highlighted.">
+
+        <figcaption>Figure 1: Reaching Byblos from the user menu.</figcaption>
+    </figure>
+
+    <h2>The dashboard at a glance</h2>
+    <p>The dashboard is organised into five tabs:</p>
+    <ul class="byblos-docs-deflist">
+        <li><strong>{{#str}}nav_pages, local_byblos{{/str}}</strong>: every portfolio page you have created. Each card shows the page status (draft or published) and quick actions.</li>
+        <li><strong>{{#str}}nav_collections, local_byblos{{/str}}</strong>: your collections (ordered groups of pages), and the form for creating new ones.</li>
+        <li><strong>{{#str}}nav_artefacts, local_byblos{{/str}}</strong>: your reusable pieces of evidence: files, links, reflections, and items imported automatically from Moodle (see below).</li>
+        <li><strong>{{#str}}tab_goals, local_byblos{{/str}}</strong>: the learning goals you set for yourself. Track your progress, mark goals achieved, and link the evidence that shows you are getting there. See <a href="{{{links.goals}}}">Setting goals</a> for the full how-to.</li>
+        <li><strong>Reviews</strong>: peer reviews assigned to you, when a teacher has turned peer review on for an assignment.</li>
+    </ul>
+
+    <figure class="byblos-docs-figure">
+        <img src="{{pix.portfolio_dashboard}}" class="byblos-docs-img" loading="lazy"
+             alt="The dashboard tab bar showing Pages, Collections, Artefacts, Goals and Reviews.">
+
+        <figcaption>Figure 2: The five dashboard tabs.</figcaption>
+    </figure>
+
+    <h2>Key ideas</h2>
+    <p>Five words cover almost everything you will do in Byblos:</p>
+    <ul class="byblos-docs-deflist">
+        <li><strong>Page</strong>: a single web page you design from content blocks. The basic unit of work.</li>
+        <li><strong>Section</strong>: one content block on a page: a heading, an image gallery, a chart, a list of skills, an embedded video, and so on. You stack sections to build a page.</li>
+        <li><strong>Artefact</strong>: a reusable piece of evidence (a file, a link, a reflection, a badge). Artefacts are not tied to one course, so the same artefact can appear in pages for different courses.</li>
+        <li><strong>Collection</strong>: an ordered set of pages presented together as a small website, with navigation between them.</li>
+        <li><strong>Publish &amp; Share</strong>: publishing makes a page "live"; sharing decides <em>who</em> can see it. Both must happen before anyone else can view your work.</li>
+    </ul>
+
+    <div class="byblos-docs-note">
+        <strong>Automatic evidence.</strong> If your site has auto-import enabled, the badges you
+        earn and the courses you complete appear in your <strong>{{#str}}nav_artefacts, local_byblos{{/str}}</strong>
+        tab automatically, ready to drop into a page with the Badges or Completions section.
+    </div>
+
+    <h2>Where to next</h2>
+    <p>
+        Ready to make something? Head to <a href="{{{links.building_pages}}}">Building pages</a>.
+        Or, if you have a specific goal, pick the matching use case:
+        <a href="{{{links.usecase_programme}}}">programme exit portfolio</a>,
+        <a href="{{{links.usecase_course}}}">course assessment</a>, or
+        <a href="{{{links.usecase_professional}}}">professional showcase</a>.
+    </p>
+</div>

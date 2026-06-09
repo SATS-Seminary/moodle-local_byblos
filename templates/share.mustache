@@ -77,9 +77,9 @@ Example context (json):
                                 <div class="input-group input-group-sm" style="max-width: 400px;">
                                     <input type="text" class="form-control" value="{{ publicurl }}" readonly id="public-url-{{ id }}">
                                     <div class="input-group-append">
-                                        <button class="btn btn-outline-secondary"
+                                        <button class="btn btn-outline-secondary byblos-share-copy"
                                                 type="button"
-                                                onclick="navigator.clipboard.writeText(document.getElementById('public-url-{{ id }}').value);"
+                                                data-byblos-copy="public-url-{{ id }}"
                                                 title="{{# str }} share_token_copied, local_byblos {{/ str }}">
                                             <i class="fa fa-copy"></i>
                                         </button>
@@ -90,14 +90,14 @@ Example context (json):
                         </td>
                         <td>{{ timecreated }}</td>
                         <td>
-                            <form method="post" action="{{ actionurl }}" class="d-inline">
+                            <form method="post" action="{{ actionurl }}" class="d-inline"
+                                  data-byblos-confirm="{{# str }} share_revoke_confirm, local_byblos {{/ str }}">
                                 <input type="hidden" name="sesskey" value="{{ sesskey }}">
                                 <input type="hidden" name="action" value="remove">
                                 <input type="hidden" name="shareid" value="{{ id }}">
                                 <input type="hidden" name="id" value="{{ itemid }}">
                                 <input type="hidden" name="type" value="{{ itemtype }}">
-                                <button type="submit" class="btn btn-sm btn-outline-danger"
-                                        onclick="return confirm('{{# str }} share_revoke_confirm, local_byblos {{/ str }}');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
                                     <i class="fa fa-times"></i> {{# str }} share_revoke, local_byblos {{/ str }}
                                 </button>
                             </form>

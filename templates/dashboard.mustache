@@ -49,10 +49,42 @@ Example context (json):
         "revieweename": "example",
         "timeassigned": "example",
         "hasurl": "#",
-        "reviewurl": "#"
+        "reviewurl": "#",
+        "docsurl": "#",
+        "tab_goals": false,
+        "has_goals": false,
+        "cancreategoals": false,
+        "goaltemplates": [
+            {"key": "reflection", "title": "example", "description": "example", "practice": "Reflection"}
+        ],
+        "goals": [
+            {
+                "id": 1,
+                "title": "example",
+                "description": "example",
+                "status": "active",
+                "statuslabel": "Active",
+                "is_active": true,
+                "is_achieved": false,
+                "is_archived": false,
+                "progress": 40,
+                "hastarget": false,
+                "targetdate": "",
+                "haslinks": false,
+                "links": [
+                    {"type": "page", "id": 2, "title": "example", "url": "#"}
+                ]
+            }
+        ]
     }
 }}
 <div class="byblos-dashboard">
+
+    <div class="byblos-dashboard-help d-flex justify-content-end mb-2">
+        <a href="{{{docsurl}}}" class="btn btn-outline-info btn-sm">
+            <i class="fa fa-question-circle"></i> {{#str}}docs_nav_help, local_byblos{{/str}}
+        </a>
+    </div>
 
     {{#has_importmsgs}}
     <div class="alert alert-info alert-dismissible fade show" role="alert">
@@ -77,6 +109,11 @@ Example context (json):
         <li class="nav-item">
             <a class="nav-link {{#tab_artefacts}}active{{/tab_artefacts}}" data-bs-toggle="tab" href="#byblos-tab-artefacts" role="tab">
                 <i class="fa fa-puzzle-piece"></i> {{#str}}tab_artefacts, local_byblos{{/str}}
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{#tab_goals}}active{{/tab_goals}}" data-bs-toggle="tab" href="#byblos-tab-goals" role="tab">
+                <i class="fa fa-bullseye"></i> {{#str}}tab_goals, local_byblos{{/str}}
             </a>
         </li>
         <li class="nav-item">
@@ -120,7 +157,7 @@ Example context (json):
                                     <i class="fa fa-pencil"></i>
                                 </a>
                                 <form method="post" action="{{{deleteurl}}}" class="d-inline"
-                                      onsubmit="return confirm('{{#str}}confirmdeletepage, local_byblos{{/str}}');">
+                                      data-byblos-confirm="{{#str}}confirmdeletepage, local_byblos{{/str}}">
                                     <input type="hidden" name="sesskey" value="{{sesskey}}">
                                     <input type="hidden" name="action" value="page">
                                     <input type="hidden" name="id" value="{{id}}">
@@ -212,7 +249,7 @@ Example context (json):
                                 </a>
                                 {{#is_creator}}
                                 <form method="post" action="{{{deleteurl}}}" class="d-inline"
-                                      onsubmit="return confirm('{{#str}}confirmdeletecollection, local_byblos{{/str}}');">
+                                      data-byblos-confirm="{{#str}}confirmdeletecollection, local_byblos{{/str}}">
                                     <input type="hidden" name="sesskey" value="{{sesskey}}">
                                     <input type="hidden" name="action" value="collection">
                                     <input type="hidden" name="id" value="{{id}}">
@@ -262,7 +299,7 @@ Example context (json):
                                     <i class="fa fa-pencil"></i>
                                 </a>
                                 <form method="post" action="{{{deleteurl}}}" class="d-inline"
-                                      onsubmit="return confirm('{{#str}}confirmdeleteartefact, local_byblos{{/str}}');">
+                                      data-byblos-confirm="{{#str}}confirmdeleteartefact, local_byblos{{/str}}">
                                     <input type="hidden" name="sesskey" value="{{sesskey}}">
                                     <input type="hidden" name="action" value="artefact">
                                     <input type="hidden" name="id" value="{{id}}">
@@ -283,6 +320,110 @@ Example context (json):
                 <a href="{{{newartefacturl}}}">{{#str}}newartefact, local_byblos{{/str}}</a>
             </div>
             {{/has_artefacts}}
+        </div>
+
+        {{! ---- My Goals Tab ---- }}
+        <div class="tab-pane fade {{#tab_goals}}show active{{/tab_goals}}" id="byblos-tab-goals" role="tabpanel"
+             data-byblos-goals="1">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4>{{#str}}tab_goals, local_byblos{{/str}}</h4>
+                {{#cancreategoals}}
+                <button type="button" class="btn btn-primary byblos-goal-new">
+                    <i class="fa fa-plus"></i> {{#str}}goal_new, local_byblos{{/str}}
+                </button>
+                {{/cancreategoals}}
+            </div>
+            <p class="text-muted small">{{#str}}goals_intro, local_byblos{{/str}}</p>
+
+            {{#cancreategoals}}
+            <div class="byblos-goal-quickstart mb-3" data-byblos-quickstart>
+                <button type="button" class="btn btn-outline-info btn-sm byblos-goal-qs-toggle">
+                    <i class="fa fa-magic"></i> {{#str}}goal_quickstart_toggle, local_byblos{{/str}}
+                </button>
+                <div class="byblos-goal-qs-body {{#has_goals}}d-none{{/has_goals}}">
+                    <p class="text-muted small mt-2 mb-2">{{#str}}goal_quickstart_intro, local_byblos{{/str}}</p>
+                    <div class="byblos-goal-qs-grid">
+                        {{#goaltemplates}}
+                        <div class="byblos-goal-tpl">
+                            <span class="byblos-goal-tpl-badge">{{practice}}</span>
+                            <span class="byblos-goal-tpl-title">{{title}}</span>
+                            <span class="byblos-goal-tpl-desc">{{description}}</span>
+                            <button type="button" class="btn btn-sm btn-primary byblos-goal-tpl-add"
+                                    data-title="{{title}}" data-description="{{description}}">
+                                <i class="fa fa-plus"></i> {{#str}}goal_template_add, local_byblos{{/str}}
+                            </button>
+                        </div>
+                        {{/goaltemplates}}
+                    </div>
+                </div>
+            </div>
+            {{/cancreategoals}}
+
+            <div class="byblos-goal-list">
+                {{#has_goals}}
+                <div class="row">
+                    {{#goals}}
+                    <div class="col-lg-6 mb-4 byblos-goal-card" data-goalid="{{id}}">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <h5 class="card-title mb-1 byblos-goal-title">{{title}}</h5>
+                                    <span class="badge {{#is_active}}badge-primary{{/is_active}}{{#is_achieved}}badge-success{{/is_achieved}}{{#is_archived}}badge-secondary{{/is_archived}}">
+                                        {{statuslabel}}
+                                    </span>
+                                </div>
+                                {{#description}}
+                                <div class="card-text text-muted small byblos-goal-desc">{{{description}}}</div>
+                                {{/description}}
+                                <div class="progress my-2" style="height: 8px;">
+                                    <div class="progress-bar" role="progressbar" style="width: {{progress}}%;"
+                                         aria-valuenow="{{progress}}" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                                <div class="small text-muted mb-2">
+                                    {{progress}}%{{#hastarget}} · {{#str}}goal_target, local_byblos{{/str}} {{targetdate}}{{/hastarget}}
+                                </div>
+                                {{#haslinks}}
+                                <div class="byblos-goal-evidence">
+                                    <strong class="small">{{#str}}goal_evidence, local_byblos{{/str}}</strong>
+                                    <ul class="list-unstyled small mb-0">
+                                        {{#links}}
+                                        <li>
+                                            <i class="fa fa-link"></i>
+                                            <a href="{{{url}}}">{{title}}</a>
+                                        </li>
+                                        {{/links}}
+                                    </ul>
+                                </div>
+                                {{/haslinks}}
+                            </div>
+                            {{#cancreategoals}}
+                            <div class="card-footer bg-transparent">
+                                <button type="button" class="btn btn-sm btn-outline-secondary byblos-goal-evidence-add">
+                                    <i class="fa fa-link"></i> {{#str}}goal_addevidence, local_byblos{{/str}}
+                                </button>
+                                <div class="float-right">
+                                    <button type="button" class="btn btn-sm btn-outline-primary byblos-goal-edit">
+                                        <i class="fa fa-pencil"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger byblos-goal-delete">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            {{/cancreategoals}}
+                        </div>
+                    </div>
+                    {{/goals}}
+                </div>
+                {{/has_goals}}
+                {{^has_goals}}
+                {{^cancreategoals}}
+                <div class="alert alert-info byblos-goal-empty">
+                    {{#str}}nogoals_dashboard, local_byblos{{/str}}
+                </div>
+                {{/cancreategoals}}
+                {{/has_goals}}
+            </div>
         </div>
 
         {{! ---- Reviews to do Tab ---- }}

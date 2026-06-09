@@ -69,7 +69,7 @@ Example context (json):
                             <i class="fa fa-pencil"></i>
                         </a>
                         <form method="post" action="{{{deleteurl}}}" class="d-inline"
-                              onsubmit="return confirm('{{#str}}confirmdeleteartefact, local_byblos{{/str}}');">
+                              data-byblos-confirm="{{#str}}confirmdeleteartefact, local_byblos{{/str}}">
                             <input type="hidden" name="sesskey" value="{{sesskey}}">
                             <input type="hidden" name="action" value="artefact">
                             <input type="hidden" name="id" value="{{id}}">

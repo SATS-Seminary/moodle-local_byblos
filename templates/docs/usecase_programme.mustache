@@ -1,0 +1,111 @@
+{{!
+    @template local_byblos/docs/usecase_programme
+
+    Use case: programme-level exit portfolio (capstone) drawing evidence across
+    several courses, for demonstration of learning + metacognition.
+
+    Context variables:
+    - links (object) Map of topic key => URL.
+    - dashurl (string) Portfolio dashboard URL.
+    - newpageurl (string) New-page wizard URL.
+
+    @package    local_byblos
+    @copyright  2026 South African Theological Seminary
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+        "dashurl": "#",
+        "newpageurl": "#",
+        "links": {
+            "index": "#", "getting_started": "#", "building_pages": "#",
+            "publishing": "#", "collections": "#", "sharing": "#",
+            "assessment": "#", "usecase_programme": "#", "usecase_course": "#",
+            "usecase_professional": "#"
+        }
+    }
+}}
+<div class="byblos-docs-article">
+
+    <h1>{{#str}}docs_topic_usecase_programme, local_byblos{{/str}}</h1>
+    <p class="byblos-docs-lead">
+        A programme-level exit portfolio (a "capstone") asks you to step back and show what you have
+        learned across your whole programme, pulling evidence from several courses, and to reflect on
+        <em>how</em> you have grown. Byblos is well suited to this because artefacts are not locked to a
+        single course, and a collection lets you present many strands of evidence as one coherent
+        mini-site.
+    </p>
+
+    <div class="byblos-docs-note">
+        <strong>The shape we'll build.</strong> An introductory "About this portfolio" home page that
+        frames your learning journey, then one page per programme outcome (or theme), each weaving
+        together evidence from different courses with your own reflection. All gathered into a single
+        collection you share with your assessor.
+    </div>
+
+    <h2>Example</h2>
+    <p>
+        <em>Thandi is finishing a three-year degree. Her programme has five graduate outcomes. She
+        builds a home page introducing herself and her growth, then five outcome pages, each citing an
+        assignment from one course, a badge from another, and a reflection tying them to that outcome.
+        She gathers the six pages into one collection and shares it with her programme coordinator.</em>
+    </p>
+
+    <h2>Step 1: Gather your evidence as artefacts</h2>
+    <ol class="byblos-docs-steps">
+        <li>Open the <strong>{{#str}}nav_artefacts, local_byblos{{/str}}</strong> tab on your dashboard.</li>
+        <li>Check what is already there, earned <strong>badges</strong> and <strong>course completions</strong> are imported automatically if your site enables it.</li>
+        <li>Add anything else: upload key assignments or files, add links, and write short <strong>reflections</strong>. Because artefacts span courses, you can pull a single library of evidence from across the whole programme.</li>
+    </ol>
+
+    <figure class="byblos-docs-figure">
+        <div class="byblos-docs-shot" role="img" aria-label="The Artefacts tab with mixed evidence">
+            <i class="fa fa-camera" aria-hidden="true"></i>
+            <span>Screenshot: the Artefacts tab showing a mix of evidence types, an uploaded essay, a course-completion item, a badge, and a reflection, drawn from different courses.</span>
+        </div>
+        <figcaption>Figure 1: A cross-course evidence library.</figcaption>
+    </figure>
+
+    <h2>Step 2: Build one page per outcome</h2>
+    <ol class="byblos-docs-steps">
+        <li>Create a new page for each programme outcome, the <strong>Learning Journey</strong> template suits reflective, evidence-led pages (see <a href="{{{links.building_pages}}}">Building pages</a>).</li>
+        <li>On each page, state the outcome, then add evidence sections, Artefacts, Badges, Completions, a Files list, an image Gallery, drawing from <em>different</em> courses.</li>
+        <li>After each piece of evidence, add a <strong>Text</strong> section of reflection: what it shows, what you learned, what you would do differently. This reflection is what turns evidence into demonstration of learning.</li>
+    </ol>
+
+    <div class="byblos-docs-tip">
+        <strong>Make the metacognition visible.</strong> Assessors of capstone portfolios are looking for
+        self-awareness, not just artefacts. Use a Pull quote for a guiding insight, a Timeline to show how
+        your thinking changed over the programme, and reflective Text sections that name your growth
+        explicitly.
+    </div>
+
+    <h2>Step 3: Gather the pages into a collection</h2>
+    <ol class="byblos-docs-steps">
+        <li>Create a collection, for example "BA Exit Portfolio" (see <a href="{{{links.collections}}}">Collections</a>).</li>
+        <li>Add your outcome pages plus an introductory page.</li>
+        <li>Make the introduction the <strong>{{#str}}collection_home_badge, local_byblos{{/str}}</strong> with <strong>{{#str}}collection_make_home, local_byblos{{/str}}</strong>, and order the outcome pages logically.</li>
+        <li>Optionally add a <strong>Page navigation</strong> section to the home page so readers can jump straight to any outcome.</li>
+    </ol>
+
+    <figure class="byblos-docs-figure">
+        <div class="byblos-docs-shot" role="img" aria-label="The exit-portfolio collection">
+            <i class="fa fa-camera" aria-hidden="true"></i>
+            <span>Screenshot: the collection view for an exit portfolio, an "About this portfolio" home page badged as the home page, followed by five outcome pages in order.</span>
+        </div>
+        <figcaption>Figure 2: The capstone as one navigable collection.</figcaption>
+    </figure>
+
+    <h2>Step 4: Publish and hand it over</h2>
+    <ol class="byblos-docs-steps">
+        <li><a href="{{{links.publishing}}}">Publish</a> each page in the collection.</li>
+        <li><a href="{{{links.sharing}}}">Share</a> the collection with your assessor, by name (<strong>{{#str}}share_user, local_byblos{{/str}}</strong>) or with the programme's review course (<strong>{{#str}}share_course, local_byblos{{/str}}</strong>). The whole mini-site travels as one share.</li>
+        <li>If your programme assesses the capstone through a Moodle assignment, submit the <em>collection</em> instead, choose "Snapshot on submit" so your exit record is frozen at hand-in. See <a href="{{{links.assessment}}}">Submitting for assessment</a>.</li>
+    </ol>
+
+    <div class="byblos-docs-note">
+        <strong>Reuse, don't duplicate.</strong> The same artefact (say, a capstone project file) can
+        appear on more than one outcome page. Build your evidence once and reference it wherever it is
+        relevant.
+    </div>
+</div>

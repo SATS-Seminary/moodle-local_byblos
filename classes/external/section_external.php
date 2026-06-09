@@ -46,7 +46,7 @@ class section_external extends external_api {
         'hero', 'text', 'text_image', 'gallery', 'skills', 'timeline',
         'badges', 'completions', 'social', 'cta', 'divider', 'custom',
         'chart', 'cloud', 'quote', 'stats', 'citations', 'files', 'youtube',
-        'pagenav',
+        'pagenav', 'reflection', 'alignment', 'goals',
     ];
 
     /**
@@ -448,9 +448,102 @@ class section_external extends external_api {
             'files'       => '{"heading":"Files","display":"list","items":[]}',
             'youtube'     => '{"heading":"","url":"","description":"","start":0,"alignment":"full","body":""}',
             'pagenav'     => '{"heading":"Related pages","source":"collection","collectionid":0,"pageids":[],"display":"pills","show_descriptions":false}',
+            'reflection'  => '{"heading":"Reflection","framework":"gibbs","intro":"","bodyhtml":""}',
+            'alignment'   => '{"heading":"Outcome map","intro":"","source":"freeform","frameworkid":0,"outcomes":[]}',
+            'goals'       => '{"heading":"My goals","mode":"all_active","goalids":[]}',
         ];
         // phpcs:enable moodle.Files.LineLength
 
         return $defaults[$stype] ?? '{}';
+    }
+
+    /**
+     * Parameters for save_reflection.
+     *
+     * @return external_function_parameters
+     */
+    public static function save_reflection_parameters(): external_function_parameters {
+        return new external_function_parameters([
+            'sectionid'   => new external_value(PARAM_INT, 'Section ID'),
+            'heading'     => new external_value(PARAM_TEXT, 'Heading'),
+            'framework'   => new external_value(PARAM_ALPHA, 'freewrite|wsnw|gibbs|deal|kolb'),
+            'intro'       => new external_value(PARAM_TEXT, 'Optional intro text'),
+            'bodyhtml'    => new external_value(PARAM_RAW, 'Reflection body HTML (with draft media URLs)'),
+            'draftitemid' => new external_value(PARAM_INT, 'Editor draft area itemid'),
+        ]);
+    }
+
+    /**
+     * Save a reflection section: persist heading/framework/intro and the rich
+     * body, moving recorded media from the draft area into the permanent
+     * reflection file area keyed to this section.
+     *
+     * @param int    $sectionid
+     * @param string $heading
+     * @param string $framework
+     * @param string $intro
+     * @param string $bodyhtml
+     * @param int    $draftitemid
+     * @return array{rendered: string}
+     */
+    public static function save_reflection(
+        int $sectionid,
+        string $heading,
+        string $framework,
+        string $intro,
+        string $bodyhtml,
+        int $draftitemid
+    ): array {
+        self::validate_parameters(self::save_reflection_parameters(), [
+            'sectionid'   => $sectionid,
+            'heading'     => $heading,
+            'framework'   => $framework,
+            'intro'       => $intro,
+            'bodyhtml'    => $bodyhtml,
+            'draftitemid' => $draftitemid,
+        ]);
+
+        [$sec, $page] = self::require_section_owner($sectionid);
+
+        if (!in_array($framework, ['freewrite', 'wsnw', 'gibbs', 'deal', 'kolb'], true)) {
+            throw new \moodle_exception('error:reflectionsave', 'local_byblos');
+        }
+
+        global $CFG;
+        require_once($CFG->libdir . '/filelib.php');
+
+        $usercontext = \context_user::instance((int) $page->userid);
+        $savedhtml = file_save_draft_area_files(
+            $draftitemid,
+            $usercontext->id,
+            'local_byblos',
+            \local_byblos\file_manager::FILEAREA_REFLECTION,
+            $sectionid,
+            ['subdirs' => 0, 'maxfiles' => -1, 'maxbytes' => \local_byblos\file_manager::MAX_REFLECTION_BYTES],
+            $bodyhtml
+        );
+
+        $configdata = json_encode([
+            'heading'   => $heading,
+            'framework' => $framework,
+            'intro'     => $intro,
+            'bodyhtml'  => $savedhtml,
+        ]);
+        section::update((int) $sectionid, ['configdata' => $configdata]);
+
+        $sec = section::get((int) $sectionid);
+        $rendered = section_renderer::render($sec, $page->themekey ?? 'clean');
+        return ['rendered' => $rendered];
+    }
+
+    /**
+     * Return structure for save_reflection.
+     *
+     * @return external_single_structure
+     */
+    public static function save_reflection_returns(): external_single_structure {
+        return new external_single_structure([
+            'rendered' => new external_value(PARAM_RAW, 'Re-rendered section HTML'),
+        ]);
     }
 }

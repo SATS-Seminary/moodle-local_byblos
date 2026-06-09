@@ -89,10 +89,6 @@ class file extends artefact_type {
             $content = \html_writer::span(s($artefact->title), 'byblos-file-title');
         }
 
-        if (!empty($artefact->description)) {
-            $content .= \html_writer::tag('p', s($artefact->description), ['class' => 'byblos-file-desc']);
-        }
-
         return \html_writer::div($content, 'byblos-artefact byblos-artefact-file');
     }
 }

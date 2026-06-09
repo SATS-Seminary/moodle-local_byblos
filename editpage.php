@@ -100,6 +100,9 @@ $sectiontypes = [
     ['type' => 'files', 'name' => get_string('sectiontype_files', 'local_byblos'), 'description' => get_string('sectiontype_files_desc', 'local_byblos'), 'icon' => 'fa-folder-open-o'],
     ['type' => 'youtube', 'name' => get_string('sectiontype_youtube', 'local_byblos'), 'description' => get_string('sectiontype_youtube_desc', 'local_byblos'), 'icon' => 'fa-youtube-play'],
     ['type' => 'pagenav', 'name' => get_string('sectiontype_pagenav', 'local_byblos'), 'description' => get_string('sectiontype_pagenav_desc', 'local_byblos'), 'icon' => 'fa-sitemap'],
+    ['type' => 'reflection', 'name' => get_string('sectiontype_reflection', 'local_byblos'), 'description' => get_string('sectiontype_reflection_desc', 'local_byblos'), 'icon' => 'fa-pencil-square-o'],
+    ['type' => 'alignment', 'name' => get_string('sectiontype_alignment', 'local_byblos'), 'description' => get_string('sectiontype_alignment_desc', 'local_byblos'), 'icon' => 'fa-bullseye'],
+    ['type' => 'goals', 'name' => get_string('sectiontype_goals', 'local_byblos'), 'description' => get_string('sectiontype_goals_desc', 'local_byblos'), 'icon' => 'fa-flag-checkered'],
 ];
 // phpcs:enable moodle.Files.LineLength
 
@@ -163,6 +166,7 @@ $PAGE->requires->js_call_amd(
     'init',
     [$pageid]
 );
+$PAGE->requires->js_call_amd('local_byblos/confirm', 'init');
 
 // Output.
 echo $OUTPUT->header();

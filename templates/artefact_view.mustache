@@ -4,12 +4,9 @@
     View a single artefact with metadata, content, and file attachment.
 
     Context variables:
-    - artefact (object) Artefact record with id, title, typelabel, description, content,
-      has_content, timecreated.
+    - artefact (object) Artefact record with id, title, typelabel, description, timecreated.
+    - rendered (string) The type-specific rendered HTML (image, file, audio, video, link, embed, or text).
     - isowner (bool) Whether the viewer owns this artefact.
-    - has_file (bool) Whether the artefact has an attached file.
-    - file_url (string) URL to the attached file.
-    - file_name (string) Name of the attached file.
     - dashurl (string) URL back to the artefacts list.
     - editurl (string) URL to edit the artefact.
     - deleteurl (string) URL for the delete action.
@@ -26,9 +23,7 @@ Example context (json):
         "deleteurl": "#",
         "sesskey": "example",
         "artefact": "example",
-        "has_file": false,
-        "file_url": "#",
-        "file_name": "example"
+        "rendered": "example"
     }
 }}
 <div class="byblos-artefact-view">
@@ -43,7 +38,7 @@ Example context (json):
                 <i class="fa fa-pencil"></i> {{#str}}editartefact, local_byblos{{/str}}
             </a>
             <form method="post" action="{{{deleteurl}}}" class="d-inline"
-                  onsubmit="return confirm('{{#str}}confirmdeleteartefact, local_byblos{{/str}}');">
+                  data-byblos-confirm="{{#str}}confirmdeleteartefact, local_byblos{{/str}}">
                 <input type="hidden" name="sesskey" value="{{sesskey}}">
                 <input type="hidden" name="action" value="artefact">
                 <input type="hidden" name="id" value="{{artefact.id}}">
@@ -63,20 +58,10 @@ Example context (json):
             <p class="text-muted mt-2">{{{artefact.description}}}</p>
             {{/artefact.description}}
 
-            {{#artefact.has_content}}
             <hr>
             <div class="byblos-artefact-content">
-                {{{artefact.content}}}
+                {{{rendered}}}
             </div>
-            {{/artefact.has_content}}
-
-            {{#has_file}}
-            <hr>
-            <div class="byblos-artefact-file">
-                <i class="fa fa-paperclip"></i>
-                <a href="{{{file_url}}}" target="_blank">{{file_name}}</a>
-            </div>
-            {{/has_file}}
 
             <hr>
             <small class="text-muted">{{artefact.timecreated}}</small>

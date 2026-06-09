@@ -5,6 +5,136 @@ All notable changes to the βyblos ePortfolio plugin will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1] - 2026-06-09
+
+Security patch closing a stored cross-site scripting hole in shared and public
+pages.
+
+### Security
+- Fixed a stored XSS vulnerability (CWE-79). Text, text-and-image, quote and
+  YouTube section bodies are stored as raw editor HTML and were written to the
+  page without sanitisation, so a page author could embed an active payload (for
+  example `<img src=x onerror=...>`) that ran in the browser of any teacher,
+  reviewer or anonymous visitor who opened the shared or published page. All four
+  body sinks, across both the live renderer and the editor preview, now pass
+  through HTMLPurifier via a shared `section_helpers::clean_body()` helper, the
+  same defence already used by the custom-HTML and reflection sections. Link
+  targets in quote and citation sections are now validated with
+  `clean_param(PARAM_URL)`, which strips `javascript:` and other dangerous URL
+  schemes. Legitimate formatting (bold, lists, links, inline styles) is
+  preserved.
+
+## [1.2.0] - 2026-06-07
+
+Artefacts gain real media types, and the codebase is hardened for general release
+against the Moodle plugin-contribution checklist.
+
+### Added
+
+#### Artefacts: type-aware form and new media types
+- The create/edit form is now a native Moodle form that adapts to the chosen
+  type, replacing the fixed text-only form. New types alongside Text: **Image**
+  and **File** (uploaded via the file picker), **Link** (a URL bookmark),
+  **Audio** and **Video** (recorded in-browser with the satsrecorder, or
+  uploaded), and **Embed** (a YouTube/Vimeo address played inline via Moodle's
+  media manager). Each type renders correctly on the artefact view.
+- New renderers (`audio`, `video`, `link`, `embed`), a `creatable_types()`
+  registry that excludes the auto-imported types (badge, course completion,
+  blog), and a dedicated `artefact` file area with an owner/manager/viewshared
+  access gate in `local_byblos_pluginfile`.
+
+### Fixed
+- Artefacts: selecting any non-text type previously left the form unchanged and
+  saved no real content (no file upload, no URL field). Also fixed the
+  `type`/`artefacttype` column mismatch (saving an edit errored and the selector
+  never preselected on edit) and a missing `artefacttype_image` string.
+
+### Changed (pre-release compliance hardening)
+- Replaced inline JavaScript (`onsubmit="return confirm(...)"` on
+  delete/publish/revoke forms, plus a clipboard `onclick`) with data attributes
+  wired by AMD modules: a new `local_byblos/confirm` module shows a confirm modal
+  for any `form[data-byblos-confirm]`, and `local_byblos/share` handles the
+  copy-link button. This follows Moodle's Output API and AMD guidance.
+- Frankenstyle: renamed the global helper `byblos_upload_error` to
+  `local_byblos_upload_error` so every plugin function is correctly prefixed.
+
+### Notes
+- Repository naming: the recommended pattern is `moodle-local_byblos` (underscore
+  between type and name). The current repository is `moodle-local-byblos`; a
+  rename is advisory and left to the maintainer.
+
+## [1.1.0] - 2026-06-07
+
+A pedagogy-driven release: four new tools turn the documented ePortfolio theory
+into product — scaffolded multimodal **Reflection**, an **Outcome map** for
+constructive alignment, a first-class **Goals** store with a dashboard tab, and
+owner-moderated **page feedback** — alongside the new in-plugin documentation hub.
+Adds three database tables and a column, two capabilities, four events, and full
+privacy coverage (schema version `2026060702`).
+
+### Added
+
+#### Pedagogy-driven widgets (reflection, alignment, goals, feedback)
+- **Reflection section** — scaffolded reflective writing with a selectable
+  framework (*What? So what? Now what?*, Gibbs' cycle, DEAL, Kolb) that seeds the
+  prompts, and **multimodal capture**: the writing field is a Moodle TinyMCE
+  editor with the `tiny_satsrecorder` plugin, so students can record audio, video
+  or screen captures inline. Body is sanitised through `format_text` (HTMLPurifier
+  passes `<audio>`/`<video>`), media stored in a new `reflection` file area with a
+  `local_byblos_pluginfile` access gate; edited via a `core/fragment` modal +
+  `save_reflection` web service.
+- **Outcome map section** — list programme outcomes / rubric criteria and map
+  evidence (artefacts or pages) to each with a note (constructive alignment).
+  Freeform by default, with optional one-click import from a core competency
+  framework when site competencies are enabled (degrades silently when off).
+- **Goals** — a first-class, dashboard-managed store (`local_byblos_goal` +
+  `local_byblos_goal_link`): set goals, track 0–100% progress, mark
+  active/achieved/archived, link evidence as it accrues. New **Goals** dashboard
+  tab and a **Goals** section that surfaces a page owner's goals with progress
+  bars. New capability `local/byblos:managegoals`; `goal_*` events; full privacy.
+  The Goals tab also offers six **quick-start templates** (scaffolded starter
+  goals, each grounded in a high-impact practice) that a learner can add in one
+  click and then personalise.
+- **Page feedback** — owner-moderated, logged-in feedback on a shared page with a
+  per-page scope switch (**Off / Teachers only / Cohort**); no anonymous/public
+  feedback (the public-token path renders no feedback UI and the externals require
+  the system context). New table `local_byblos_pagefeedback`, capability
+  `local/byblos:leavefeedback`, `page_feedback_left` event, full privacy.
+- Schema: adds `local_byblos_goal`, `local_byblos_goal_link`,
+  `local_byblos_pagefeedback` and a `feedback` column on `local_byblos_page`
+  (upgrade savepoints `2026060701`, `2026060702`; version `2026060702`, release
+  `1.1.0`). Docs hub updated (Building pages catalogue, Getting started Goals tab,
+  Sharing feedback section).
+
+#### In-plugin documentation hub
+- New self-service help site at `/local/byblos/docs.php`, reachable from a
+  "Help & guides" button on the portfolio dashboard. Two-pane layout (sidebar
+  of topics + content) with prev/next navigation.
+- Six how-to guides — Getting started, Building pages, Publishing, Collections,
+  Sharing, Submitting for assessment — and three end-to-end use-case
+  walkthroughs: programme-level exit portfolio, course summative assessment,
+  professional/skills showcase. The assessment guide and use cases carry
+  "For students" / "For teachers" role badges.
+- Content is anchored to the real UI: button labels are pulled from the live
+  lang strings (e.g. Publish, Share) so the docs stay in step with the
+  interface. UI figures are labelled screenshot placeholders describing the
+  intended image; drop real images into `pix/docs/` and swap the placeholder.
+- Concept figures ship as scalable inline-SVG diagrams (no image asset needed):
+  the "Why ePortfolios work" page renders the Collect → Curate → Connect → Share
+  cycle with Reflection at its hub as a self-contained, theme-styled SVG.
+- `\local_byblos\docs` topic registry (single source of truth for the sidebar,
+  validation, prev/next and cross-links); `docs.mustache` shell + content
+  partials under `templates/docs/`; `docs_*` lang strings; `.byblos-docs-*`
+  styles (step lists, callouts, role badges, card grids, screenshot figures).
+- A "Concepts & best practice" group in the docs hub with two pages:
+  **Why ePortfolios work** (the pedagogy behind ePortfolios — reflection and
+  metacognition, integration of learning, portfolio "for" vs "of" learning,
+  learner agency, and the ePortfolio as a high-impact practice — with an
+  accurate reference list drawn from Yancey, Barrett, Kuh & O'Donnell, Watson
+  et al., Eynon & Gambino, Smith & Tillema, Wolf et al., Kolb, Schön and Dewey),
+  and **Best practices** (ten high-level practices for building a strong
+  portfolio, each tied back to the pedagogy and to the relevant Byblos feature).
+
 ## [1.0.1] - 2026-04-21
 
 ### Added
@@ -158,4 +288,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dashboard block
 - Rubric-based portfolio assessment
 
+[1.2.0]: https://github.com/sats/moodle-local_byblos/releases/tag/v1.2.0
+[1.1.0]: https://github.com/sats/moodle-local_byblos/releases/tag/v1.1.0
 [1.0.0]: https://github.com/sats/moodle-local_byblos/releases/tag/v1.0.0

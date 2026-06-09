@@ -118,7 +118,7 @@ function local_byblos_pluginfile(
         return false;
     }
 
-    $allowedareas = ['images', 'exports', 'artefact'];
+    $allowedareas = ['images', 'exports', 'artefact', 'reflection'];
     if (!in_array($filearea, $allowedareas, true)) {
         return false;
     }
@@ -155,6 +155,42 @@ function local_byblos_pluginfile(
                 if (!$hasshare) {
                     return false;
                 }
+            }
+        }
+    }
+
+    // For the reflection filearea, resolve the page via the owning section and
+    // enforce the same gate as page viewing (owner / published / active share).
+    // (itemid is the section id; files live in the page owner's user context.)
+    if ($filearea === 'reflection' && $context->contextlevel === CONTEXT_USER) {
+        $section = \local_byblos\section::get($itemid);
+        $page = $section ? \local_byblos\page::get((int) $section->pageid) : null;
+        if (!$page) {
+            return false;
+        }
+        if ((int) $USER->id !== (int) $page->userid) {
+            $ismanager = has_capability('local/byblos:manageall', context_system::instance());
+            $ispublished = (isset($page->status) && $page->status === 'published');
+            $canview = \local_byblos\share::can_view_page((int) $USER->id, (int) $page->id);
+            if (!$ismanager && !$ispublished && !$canview) {
+                return false;
+            }
+        }
+    }
+
+    // For the artefact filearea, files live in the owner's user context with
+    // itemid = artefact id. Served to the owner, a manager, or a teacher who can
+    // view shared work (artefacts are evidence teachers review).
+    if ($filearea === 'artefact' && $context->contextlevel === CONTEXT_USER) {
+        $artefactrec = \local_byblos\artefact::get($itemid);
+        if (!$artefactrec || (int) $context->instanceid !== (int) $artefactrec->userid) {
+            return false;
+        }
+        if ((int) $USER->id !== (int) $artefactrec->userid) {
+            $ismanager = has_capability('local/byblos:manageall', context_system::instance());
+            $isteacher = has_capability('local/byblos:viewshared', context_system::instance());
+            if (!$ismanager && !$isteacher) {
+                return false;
             }
         }
     }
@@ -265,7 +301,7 @@ function local_byblos_extend_settings_navigation(settings_navigation $settingsna
     }
 
     $url = new moodle_url('/local/byblos/peerassign.php', ['assignmentid' => $assignid]);
-    $node = $modsettings->add(
+    $node = navigation_node::create(
         get_string('manage_peer_reviewers', 'assignsubmission_byblos'),
         $url,
         navigation_node::TYPE_SETTING,
@@ -274,6 +310,16 @@ function local_byblos_extend_settings_navigation(settings_navigation $settingsna
         new pix_icon('i/users', '')
     );
     $node->showinflatnavigation = true;
+
+    // Place it just before "Advanced grading" ('advgrading') so it sits with the
+    // grading tools rather than at the bottom of the actions/"More" menu. Themes
+    // that render the settings tree directly (e.g. the cog/More menu) honour this
+    // order; Boost's secondary navigation orders core nodes by its own weight map,
+    // so there the node appears among the trailing third-party items.
+    $beforekey = in_array('advgrading', $modsettings->get_children_key_list(), true)
+        ? 'advgrading'
+        : null;
+    $modsettings->add_node($node, $beforekey);
 }
 
 /**
@@ -320,4 +366,111 @@ function local_byblos_myprofile_navigation(
         );
         $tree->add_node($node);
     }
+}
+
+/**
+ * Build the seeded HTML scaffold for a reflection framework — prompt labels as
+ * H4 headings, each followed by an empty paragraph for the student to fill in.
+ *
+ * @param string $framework One of freewrite|wsnw|gibbs|deal|kolb.
+ * @return string Seeded HTML (empty for freewrite).
+ */
+function local_byblos_reflection_scaffold(string $framework): string {
+    $prompts = [
+        'wsnw'  => ['reflection_prompt_wsnw_1', 'reflection_prompt_wsnw_2', 'reflection_prompt_wsnw_3'],
+        'gibbs' => [
+            'reflection_prompt_gibbs_1', 'reflection_prompt_gibbs_2', 'reflection_prompt_gibbs_3',
+            'reflection_prompt_gibbs_4', 'reflection_prompt_gibbs_5', 'reflection_prompt_gibbs_6',
+        ],
+        'deal'  => ['reflection_prompt_deal_1', 'reflection_prompt_deal_2', 'reflection_prompt_deal_3'],
+        'kolb'  => [
+            'reflection_prompt_kolb_1', 'reflection_prompt_kolb_2',
+            'reflection_prompt_kolb_3', 'reflection_prompt_kolb_4',
+        ],
+    ];
+    if (!isset($prompts[$framework])) {
+        return '';
+    }
+
+    $html = '';
+    foreach ($prompts[$framework] as $key) {
+        $html .= '<h4>' . get_string($key, 'local_byblos') . '</h4><p></p>';
+    }
+    return $html;
+}
+
+/**
+ * Fragment callback: render the reflection-section editor form (a moodleform
+ * with an `editor` element, which attaches TinyMCE + the satsrecorder plugin
+ * and a draft file area). Loaded into a modal by amd/src/editor.js.
+ *
+ * @param array $args Fragment args: { context, sectionid }.
+ * @return string Rendered form HTML (with inline editor bootstrap JS).
+ */
+function local_byblos_output_fragment_reflection_editor(array $args): string {
+    global $USER, $CFG;
+    require_once($CFG->libdir . '/filelib.php');
+
+    $sectionid = (int) ($args['sectionid'] ?? 0);
+    $section = \local_byblos\section::get($sectionid);
+    if (!$section) {
+        return '';
+    }
+    $page = \local_byblos\page::get((int) $section->pageid);
+    if (!$page) {
+        return '';
+    }
+    // Reflection is self-authored: only the page owner (or a manager) may edit.
+    if (
+        (int) $page->userid !== (int) $USER->id
+            && !has_capability('local/byblos:manageall', context_system::instance())
+    ) {
+        return '';
+    }
+
+    $cfg = json_decode($section->configdata ?? '{}', true) ?: [];
+    $framework = $cfg['framework'] ?? 'gibbs';
+    if (!in_array($framework, ['freewrite', 'wsnw', 'gibbs', 'deal', 'kolb'], true)) {
+        $framework = 'gibbs';
+    }
+    $bodyhtml = (string) ($cfg['bodyhtml'] ?? '');
+    if (
+        trim(strip_tags($bodyhtml)) === '' && stripos($bodyhtml, '<audio') === false
+            && stripos($bodyhtml, '<video') === false
+    ) {
+        $bodyhtml = local_byblos_reflection_scaffold($framework);
+    }
+
+    $usercontext = context_user::instance((int) $page->userid);
+    $editoroptions = [
+        'maxfiles'              => EDITOR_UNLIMITED_FILES,
+        'maxbytes'              => \local_byblos\file_manager::MAX_REFLECTION_BYTES,
+        'context'               => context_system::instance(),
+        'subdirs'               => 0,
+        'enable_filemanagement' => true,
+    ];
+    $draftid = 0;
+    $bodyhtml = file_prepare_draft_area(
+        $draftid,
+        $usercontext->id,
+        'local_byblos',
+        \local_byblos\file_manager::FILEAREA_REFLECTION,
+        $sectionid,
+        $editoroptions,
+        $bodyhtml
+    );
+
+    $mform = new \local_byblos\form\reflection_form(null, [
+        'sectionid'     => $sectionid,
+        'editoroptions' => $editoroptions,
+    ]);
+    $mform->set_data([
+        'sectionid'       => $sectionid,
+        'heading'         => $cfg['heading'] ?? '',
+        'framework'       => $framework,
+        'intro'           => $cfg['intro'] ?? '',
+        'bodyhtml_editor' => ['text' => $bodyhtml, 'format' => FORMAT_HTML, 'itemid' => $draftid],
+    ]);
+
+    return $mform->render();
 }

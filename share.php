@@ -268,6 +268,7 @@ $templatedata = [
 ];
 
 $PAGE->requires->js_call_amd('local_byblos/share', 'init');
+$PAGE->requires->js_call_amd('local_byblos/confirm', 'init');
 
 echo $OUTPUT->header();
 echo $OUTPUT->render_from_template('local_byblos/share', $templatedata);

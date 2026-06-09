@@ -1,0 +1,101 @@
+{{!
+    @template local_byblos/docs/usecase_course
+
+    Use case: portfolio as a summative assessment within a single course.
+
+    Context variables:
+    - links (object) Map of topic key => URL.
+    - dashurl (string) Portfolio dashboard URL.
+    - newpageurl (string) New-page wizard URL.
+
+    @package    local_byblos
+    @copyright  2026 South African Theological Seminary
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+        "dashurl": "#",
+        "newpageurl": "#",
+        "pix": {"byblos_peerreview_options": "#", "byblos_submission_form": "#"},
+        "links": {
+            "index": "#", "getting_started": "#", "building_pages": "#",
+            "publishing": "#", "collections": "#", "sharing": "#",
+            "assessment": "#", "usecase_programme": "#", "usecase_course": "#",
+            "usecase_professional": "#"
+        }
+    }
+}}
+<div class="byblos-docs-article">
+
+    <h1>{{#str}}docs_topic_usecase_course, local_byblos{{/str}}</h1>
+    <p class="byblos-docs-lead">
+        Here the portfolio <em>is</em> the assignment: students build a portfolio for one course and
+        submit it for a grade through a Moodle assignment, using the Byblos submission type. This gives
+        you a frozen, fairly-graded artefact plus inline feedback, and optional peer review.
+    </p>
+
+    <h2>Example</h2>
+    <p>
+        <em>Dr Okafor's "Practical Theology" course ends with a reflective portfolio worth 40%. He adds
+        an assignment that accepts a Byblos page, set to snapshot on submit, with a rubric and a round of
+        peer review. Each student builds one page combining their fieldwork evidence with reflection,
+        submits it, reviews two classmates, and receives a graded rubric with inline comments.</em>
+    </p>
+
+    <h2><span class="byblos-docs-role byblos-docs-role-teacher">For teachers</span> Step 1: Create the assessment</h2>
+    <ol class="byblos-docs-steps">
+        <li>In your course, add an <strong>Assignment</strong> and enable the <strong>Byblos portfolio</strong> submission type (full detail in <a href="{{{links.assessment}}}">Submitting for assessment</a>).</li>
+        <li>Set <strong>what students submit</strong>: a single page is ideal for a focused course task; allow a collection if the work spans several pages.</li>
+        <li>Set <strong>snapshot mode</strong> to <strong>Snapshot on submit</strong> so grading is fair and edits after the deadline don't change what you assessed.</li>
+        <li>Attach a <strong>rubric</strong> (Moodle advanced grading) if you grade against criteria.</li>
+        <li>Optionally enable <strong>peer review</strong> and an <strong>advisory checklist</strong> of what a strong submission contains.</li>
+    </ol>
+
+    <figure class="byblos-docs-figure">
+        <img src="{{pix.byblos_peerreview_options}}" class="byblos-docs-img" loading="lazy"
+             alt="A course assignment configured for Byblos, accepted unit Single page, snapshot on submit, peer review enabled.">
+
+        <figcaption>Figure 1: A course assignment configured to collect Byblos portfolios.</figcaption>
+    </figure>
+
+    <h2><span class="byblos-docs-role byblos-docs-role-student">For students</span> Step 2: Build your portfolio for the course</h2>
+    <ol class="byblos-docs-steps">
+        <li>Create a page (see <a href="{{{links.building_pages}}}">Building pages</a>). Pick a template that fits the brief, the Learning Journey or Simple Page templates work well for reflective course portfolios.</li>
+        <li>Add your course evidence: assignment files, a gallery of work, badges or completions earned in the course, and reflective Text sections.</li>
+        <li>Check it against any advisory checklist your teacher provided.</li>
+        <li><a href="{{{links.publishing}}}">Publish</a> the page so it is ready to submit.</li>
+    </ol>
+
+    <h2><span class="byblos-docs-role byblos-docs-role-student">For students</span> Step 3: Submit it</h2>
+    <ol class="byblos-docs-steps">
+        <li>Open the assignment and click <strong>Add submission</strong>.</li>
+        <li>Choose your page (or collection) in the Byblos picker, save, and submit.</li>
+        <li>Because the task uses snapshot on submit, a frozen copy is taken at hand-in, make sure your page is final first.</li>
+    </ol>
+
+    <figure class="byblos-docs-figure">
+        <img src="{{pix.byblos_submission_form}}" class="byblos-docs-img" loading="lazy"
+             alt="The student's assignment submission form with the Byblos picker showing their course portfolio page selected.">
+
+        <figcaption>Figure 2: Submitting the portfolio to the course assignment.</figcaption>
+    </figure>
+
+    <h2><span class="byblos-docs-role byblos-docs-role-student">For students</span> Step 4: Peer review (if enabled)</h2>
+    <ol class="byblos-docs-steps">
+        <li>Open the <strong>Reviews</strong> tab on your dashboard to see classmates assigned to you.</li>
+        <li>Read each portfolio, leave inline comments, add a score if asked, and submit the review.</li>
+    </ol>
+
+    <h2><span class="byblos-docs-role byblos-docs-role-teacher">For teachers</span> Step 5: Grade</h2>
+    <ol class="byblos-docs-steps">
+        <li>In the assignment grading screen, open each student's submitted portfolio.</li>
+        <li>Leave inline comments directly on the relevant sections.</li>
+        <li>Grade with your rubric. Release grades, and, if you set peer feedback to appear on release, students see their peer comments at the same time.</li>
+    </ol>
+
+    <div class="byblos-docs-tip">
+        <strong>Why snapshot on submit matters here.</strong> Because the submission is frozen at hand-in,
+        you grade exactly what was submitted, students can keep building their portfolio afterwards for
+        other purposes, and there is a permanent record of the assessed work.
+    </div>
+</div>

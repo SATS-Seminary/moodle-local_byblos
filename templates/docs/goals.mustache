@@ -1,0 +1,160 @@
+{{!
+    @template local_byblos/docs/goals
+
+    Guide: setting and tracking learning goals on the dashboard, and surfacing
+    them on a page with the Goals section.
+
+    Context variables:
+    - links (object) Map of topic key => URL.
+    - dashurl (string) Portfolio dashboard URL.
+    - newpageurl (string) New-page wizard URL.
+
+    @package    local_byblos
+    @copyright  2026 South African Theological Seminary
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+        "dashurl": "#",
+        "newpageurl": "#",
+        "pix": {"goals_tab": "#"},
+        "links": {
+            "index": "#", "getting_started": "#", "building_pages": "#",
+            "publishing": "#", "collections": "#", "goals": "#", "sharing": "#",
+            "assessment": "#", "pedagogy": "#", "best_practices": "#",
+            "usecase_programme": "#", "usecase_course": "#",
+            "usecase_professional": "#"
+        }
+    }
+}}
+<div class="byblos-docs-article">
+
+    <h1>{{#str}}docs_topic_goals, local_byblos{{/str}}</h1>
+    <p class="byblos-docs-lead">
+        A portfolio shows what you have done. Goals add what you are working
+        <em>towards</em>. You set a goal, track your progress, and link the evidence
+        that shows you are getting there. This forward-looking habit is part of what
+        makes an ePortfolio a tool for learning, not just a record of it (see
+        <a href="{{{links.pedagogy}}}">Why ePortfolios work</a>).
+    </p>
+
+    <h2>Where your goals live</h2>
+    <p>
+        Your goals live on the <strong>{{#str}}tab_goals, local_byblos{{/str}}</strong>
+        tab of your <a href="{{{dashurl}}}">portfolio dashboard</a>. Each goal is yours
+        alone: you create and manage your own, and a teacher can see them only where you
+        choose to show them on a page. The same goals can then be displayed on any page
+        using the <strong>{{#str}}sectiontype_goals, local_byblos{{/str}}</strong> section.
+    </p>
+
+    <figure class="byblos-docs-figure">
+        <img src="{{pix.goals_tab}}" class="byblos-docs-img" loading="lazy"
+             alt="The Goals tab on the dashboard, with the quick-start starter goals and goal cards showing progress.">
+
+        <figcaption>Figure 1: The Goals tab, where you set and track your goals.</figcaption>
+    </figure>
+
+    <h2>Creating a goal</h2>
+    <ol class="byblos-docs-steps">
+        <li>Open the <strong>{{#str}}tab_goals, local_byblos{{/str}}</strong> tab on your dashboard.</li>
+        <li>Click <strong>{{#str}}goal_new, local_byblos{{/str}}</strong>.</li>
+        <li>Optional: pick a starter goal from the <strong>{{#str}}goal_startfrom, local_byblos{{/str}}</strong>
+            menu at the top of the form to prefill a research-backed goal, then edit it. Leave it on
+            <strong>{{#str}}goal_startblank, local_byblos{{/str}}</strong> to start from scratch.</li>
+        <li>Give the goal a clear <strong>{{#str}}goal_title, local_byblos{{/str}}</strong>, for example
+            "Write with clearer structure" or "Become confident leading a small group".</li>
+        <li>Add an optional <strong>{{#str}}goal_description, local_byblos{{/str}}</strong> to say what
+            success looks like, and an optional <strong>{{#str}}goal_target, local_byblos{{/str}}</strong>
+            if you are working to a deadline.</li>
+        <li>Save. The goal appears as a card on the tab, starting at 0% and marked
+            <strong>{{#str}}goalstatus_active, local_byblos{{/str}}</strong>.</li>
+    </ol>
+
+    <div class="byblos-docs-tip">
+        <strong>Write goals you can show evidence for.</strong> A good goal is specific enough that you can
+        point to a piece of work and say "this shows progress". Vague goals are hard to evidence and hard to
+        tell when you have met them.
+    </div>
+
+    <h2>Starter goals to adapt</h2>
+    <p>
+        Stuck for ideas? On the Goals tab, click <strong>{{#str}}goal_quickstart_toggle, local_byblos{{/str}}</strong>
+        to add any of these with a single click, then make it your own. Each one puts a research-backed
+        <a href="{{{links.best_practices}}}">best practice</a> into action, the same conditions that make an
+        ePortfolio a <a href="{{{links.pedagogy}}}">high-impact practice</a>. When you add one, decide what
+        evidence would show you are getting there.
+    </p>
+    <ul class="byblos-docs-deflist">
+        <li><strong>Make reflection a habit, not an afterthought.</strong> Reflection is the engine of
+            portfolio learning. Evidence: a Reflection section added after each module, or a running
+            learning-journal page.</li>
+        <li><strong>Connect my learning across courses into one story.</strong> Integrating learning, rather
+            than leaving it in separate course-shaped boxes, is one of the clearest benefits of a portfolio.
+            Evidence: a collection with a home page that frames the throughline.</li>
+        <li><strong>Map my evidence to my programme outcomes.</strong> Aligning evidence to outcomes
+            (constructive alignment) makes your portfolio legible to an assessor. Evidence: an
+            <strong>Outcome map</strong> section that links artefacts to each outcome.</li>
+        <li><strong>Use feedback to revise, not just to receive it.</strong> Frequent, acted-on feedback is one
+            of the conditions that make a practice high-impact. Evidence: a draft and a revised version that
+            shows the changes you made in response to feedback.</li>
+        <li><strong>Show growth over time, not just polished work.</strong> Evidence of change often
+            demonstrates more learning than a single finished product. Evidence: an early attempt placed beside
+            a later one, on a Timeline or a pair of pages.</li>
+        <li><strong>Demonstrate my work to a real audience.</strong> Public demonstration of competence deepens
+            the work. Evidence: a published <a href="{{{links.sharing}}}">showcase page</a> shared with a
+            teacher, a cohort, or an employer, or a recorded presentation.</li>
+    </ul>
+
+    <h2>Tracking your progress</h2>
+    <p>Open a goal with its edit control to keep it up to date as you work:</p>
+    <ul class="byblos-docs-deflist">
+        <li><strong>{{#str}}goal_progress, local_byblos{{/str}}</strong>: a figure from 0 to 100 that fills
+            the card's progress bar. Nudge it up as you make progress, rather than only at the end.</li>
+        <li><strong>{{#str}}goalstatus_label, local_byblos{{/str}}</strong>: move a goal between
+            <strong>{{#str}}goalstatus_active, local_byblos{{/str}}</strong> (still working on it),
+            <strong>{{#str}}goalstatus_achieved, local_byblos{{/str}}</strong> (done), and
+            <strong>{{#str}}goalstatus_archived, local_byblos{{/str}}</strong> (set aside, kept for the record).</li>
+        <li><strong>{{#str}}goal_target, local_byblos{{/str}}</strong>: adjust or clear the deadline as your
+            plans change.</li>
+    </ul>
+
+    <h2>Linking evidence to a goal</h2>
+    <p>
+        Evidence is what turns a goal from an intention into something you can demonstrate. You can attach
+        any of your <a href="{{{links.building_pages}}}">artefacts</a> or pages to a goal:
+    </p>
+    <ol class="byblos-docs-steps">
+        <li>On a goal card, click <strong>{{#str}}goal_addevidence, local_byblos{{/str}}</strong>.</li>
+        <li>Choose an <strong>{{#str}}goal_evidence_artefacts, local_byblos{{/str}}</strong> item or one of your
+            <strong>{{#str}}goal_evidence_pages, local_byblos{{/str}}</strong> from the list.</li>
+        <li>It appears under the goal as a link. Add as many pieces of evidence as you like, and remove any
+            that no longer fit.</li>
+    </ol>
+
+    <h2>Showing your goals on a page</h2>
+    <p>
+        Goals are private to your dashboard until you choose to display them. To put them in front of a
+        teacher or an assessor, add a <strong>{{#str}}sectiontype_goals, local_byblos{{/str}}</strong> section
+        to a page (see <a href="{{{links.building_pages}}}">Building pages</a>):
+    </p>
+    <ol class="byblos-docs-steps">
+        <li>In the page editor, add a section and choose <strong>{{#str}}sectiontype_goals, local_byblos{{/str}}</strong>.</li>
+        <li>Choose whether to show <em>all your active goals</em> or only a <em>selection</em> you pick.</li>
+        <li>The section shows each goal with its progress, updating automatically as you change the goal on
+            your dashboard. There is nothing to keep in sync by hand.</li>
+    </ol>
+
+    <div class="byblos-docs-note">
+        <strong>Goals work well with reflection.</strong> Pair a Goals section with a
+        <strong>Reflection</strong> section on the same page: state where you are heading, then reflect on the
+        evidence that shows how far you have come. See <a href="{{{links.best_practices}}}">Best practices</a>
+        for more on building a portfolio that shows growth, not just polish.
+    </div>
+
+    <h2>Next</h2>
+    <p>
+        With goals set and evidence linked, decide who can see your work in
+        <a href="{{{links.sharing}}}">Sharing</a>, or build the page that will carry them in
+        <a href="{{{links.building_pages}}}">Building pages</a>.
+    </p>
+</div>

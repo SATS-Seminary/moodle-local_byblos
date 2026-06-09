@@ -147,6 +147,45 @@ class provider implements
             'privacy:metadata:local_byblos_submission'
         );
 
+        $collection->add_database_table(
+            'local_byblos_goal',
+            [
+                'userid'       => 'privacy:metadata:local_byblos_goal:userid',
+                'title'        => 'privacy:metadata:local_byblos_goal:title',
+                'description'  => 'privacy:metadata:local_byblos_goal:description',
+                'status'       => 'privacy:metadata:local_byblos_goal:status',
+                'targetdate'   => 'privacy:metadata:local_byblos_goal:targetdate',
+                'progress'     => 'privacy:metadata:local_byblos_goal:progress',
+                'timecreated'  => 'privacy:metadata:local_byblos_goal:timecreated',
+                'timemodified' => 'privacy:metadata:local_byblos_goal:timemodified',
+            ],
+            'privacy:metadata:local_byblos_goal'
+        );
+
+        $collection->add_database_table(
+            'local_byblos_goal_link',
+            [
+                'goalid'      => 'privacy:metadata:local_byblos_goal_link:goalid',
+                'linktype'    => 'privacy:metadata:local_byblos_goal_link:linktype',
+                'linkid'      => 'privacy:metadata:local_byblos_goal_link:linkid',
+                'timecreated' => 'privacy:metadata:local_byblos_goal_link:timecreated',
+            ],
+            'privacy:metadata:local_byblos_goal_link'
+        );
+
+        $collection->add_database_table(
+            'local_byblos_pagefeedback',
+            [
+                'pageid'       => 'privacy:metadata:local_byblos_pagefeedback:pageid',
+                'authorid'     => 'privacy:metadata:local_byblos_pagefeedback:authorid',
+                'authorrole'   => 'privacy:metadata:local_byblos_pagefeedback:authorrole',
+                'body'         => 'privacy:metadata:local_byblos_pagefeedback:body',
+                'timecreated'  => 'privacy:metadata:local_byblos_pagefeedback:timecreated',
+                'timemodified' => 'privacy:metadata:local_byblos_pagefeedback:timemodified',
+            ],
+            'privacy:metadata:local_byblos_pagefeedback'
+        );
+
         return $collection;
     }
 
@@ -184,6 +223,18 @@ class provider implements
                   FROM {context} c
                   JOIN {local_byblos_submission} s ON s.userid = :userid4
                  WHERE c.contextlevel = :contextlevel4
+                   AND c.instanceid = 0
+                 UNION
+                SELECT c.id
+                  FROM {context} c
+                  JOIN {local_byblos_goal} g ON g.userid = :userid5
+                 WHERE c.contextlevel = :contextlevel5
+                   AND c.instanceid = 0
+                 UNION
+                SELECT c.id
+                  FROM {context} c
+                  JOIN {local_byblos_pagefeedback} fb ON fb.authorid = :userid6
+                 WHERE c.contextlevel = :contextlevel6
                    AND c.instanceid = 0";
 
         $params = [
@@ -191,10 +242,14 @@ class provider implements
             'userid2' => $userid,
             'userid3' => $userid,
             'userid4' => $userid,
+            'userid5' => $userid,
+            'userid6' => $userid,
             'contextlevel1' => CONTEXT_SYSTEM,
             'contextlevel2' => CONTEXT_SYSTEM,
             'contextlevel3' => CONTEXT_SYSTEM,
             'contextlevel4' => CONTEXT_SYSTEM,
+            'contextlevel5' => CONTEXT_SYSTEM,
+            'contextlevel6' => CONTEXT_SYSTEM,
         ];
 
         $contextlist->add_from_sql($sql, $params);
@@ -226,6 +281,12 @@ class provider implements
 
         $sql = "SELECT userid FROM {local_byblos_submission}";
         $userlist->add_from_sql('userid', $sql, []);
+
+        $sql = "SELECT userid FROM {local_byblos_goal}";
+        $userlist->add_from_sql('userid', $sql, []);
+
+        $sql = "SELECT authorid FROM {local_byblos_pagefeedback}";
+        $userlist->add_from_sql('authorid', $sql, []);
     }
 
     /**
@@ -313,6 +374,43 @@ class provider implements
                 (object) ['submissions' => array_values($submissions)]
             );
         }
+
+        // Export learning goals with their evidence links.
+        $goals = $DB->get_records('local_byblos_goal', ['userid' => $userid], 'sortorder ASC');
+        if ($goals) {
+            foreach ($goals as $goal) {
+                $goal->links = array_values(
+                    $DB->get_records('local_byblos_goal_link', ['goalid' => $goal->id], 'timecreated ASC')
+                );
+            }
+            writer::with_context($context)->export_data(
+                array_merge($subcontext, ['goals']),
+                (object) ['goals' => array_values($goals)]
+            );
+        }
+
+        // Export page feedback the user authored.
+        $authored = $DB->get_records('local_byblos_pagefeedback', ['authorid' => $userid]);
+        if ($authored) {
+            writer::with_context($context)->export_data(
+                array_merge($subcontext, ['feedback_authored']),
+                (object) ['feedback' => array_values($authored)]
+            );
+        }
+
+        // Export feedback others left on the user's pages (it is data about the user's portfolio).
+        if (!empty($pageids)) {
+            [$insql, $params] = $DB->get_in_or_equal($pageids, SQL_PARAMS_NAMED);
+            $received = array_values(
+                $DB->get_records_select('local_byblos_pagefeedback', "pageid $insql", $params)
+            );
+            if ($received) {
+                writer::with_context($context)->export_data(
+                    array_merge($subcontext, ['feedback_received']),
+                    (object) ['feedback' => $received]
+                );
+            }
+        }
     }
 
     /**
@@ -347,10 +445,19 @@ class provider implements
             $DB->delete_records_select('local_byblos_submission', "collectionid {$insql}", $params);
         }
 
+        // Goals and their evidence links.
+        $goalids = $DB->get_fieldset_select('local_byblos_goal', 'id', '1=1');
+        if ($goalids) {
+            [$insql, $params] = $DB->get_in_or_equal($goalids);
+            $DB->delete_records_select('local_byblos_goal_link', "goalid {$insql}", $params);
+        }
+
         $DB->delete_records('local_byblos_artefact');
         $DB->delete_records('local_byblos_page');
         $DB->delete_records('local_byblos_collection');
         $DB->delete_records('local_byblos_submission');
+        $DB->delete_records('local_byblos_goal');
+        $DB->delete_records('local_byblos_pagefeedback');
     }
 
     /**
@@ -407,6 +514,8 @@ class provider implements
             $DB->delete_records_select('local_byblos_section', "pageid {$insql}", $params);
             $DB->delete_records_select('local_byblos_share', "pageid {$insql}", $params);
             $DB->delete_records_select('local_byblos_page_course', "pageid {$insql}", $params);
+            // Feedback left by anyone on this user's pages.
+            $DB->delete_records_select('local_byblos_pagefeedback', "pageid {$insql}", $params);
         }
 
         // Get user's collection IDs to clean up dependent records.
@@ -417,10 +526,20 @@ class provider implements
             $DB->delete_records_select('local_byblos_share', "collectionid {$insql}", $params);
         }
 
+        // Goals and their evidence links.
+        $goalids = $DB->get_fieldset_select('local_byblos_goal', 'id', 'userid = ?', [$userid]);
+        if ($goalids) {
+            [$insql, $params] = $DB->get_in_or_equal($goalids);
+            $DB->delete_records_select('local_byblos_goal_link', "goalid {$insql}", $params);
+        }
+
         // Delete primary records.
         $DB->delete_records('local_byblos_artefact', ['userid' => $userid]);
         $DB->delete_records('local_byblos_page', ['userid' => $userid]);
         $DB->delete_records('local_byblos_collection', ['userid' => $userid]);
         $DB->delete_records('local_byblos_submission', ['userid' => $userid]);
+        $DB->delete_records('local_byblos_goal', ['userid' => $userid]);
+        // Feedback this user authored on others' pages.
+        $DB->delete_records('local_byblos_pagefeedback', ['authorid' => $userid]);
     }
 }

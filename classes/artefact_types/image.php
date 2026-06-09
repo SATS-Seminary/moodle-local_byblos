@@ -92,14 +92,9 @@ class image extends artefact_type {
             );
         }
 
-        $caption = '';
-        if (!empty($artefact->description)) {
-            $caption = \html_writer::tag('figcaption', s($artefact->description));
-        }
-
         return \html_writer::tag(
             'figure',
-            $imghtml . $caption,
+            $imghtml,
             ['class' => 'byblos-artefact byblos-artefact-image'],
         );
     }

@@ -1,0 +1,127 @@
+{{!
+    @template local_byblos/docs/index
+
+    Documentation landing page: short intro + card grid linking to the guides
+    and the three use-case walkthroughs.
+
+    Context variables:
+    - links (object) Map of topic key => URL, for cross-linking.
+    - dashurl (string) Portfolio dashboard URL.
+    - newpageurl (string) New-page wizard URL.
+
+    @package    local_byblos
+    @copyright  2026 South African Theological Seminary
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+        "dashurl": "#",
+        "newpageurl": "#",
+        "pix": {"portfolio_dashboard": "#"},
+        "links": {
+            "index": "#", "getting_started": "#", "building_pages": "#",
+            "publishing": "#", "collections": "#", "goals": "#", "sharing": "#",
+            "assessment": "#", "pedagogy": "#", "best_practices": "#",
+            "usecase_programme": "#", "usecase_course": "#",
+            "usecase_professional": "#"
+        }
+    }
+}}
+<div class="byblos-docs-article byblos-docs-home">
+
+    <h1>{{#str}}docs_title, local_byblos{{/str}}</h1>
+    <p class="byblos-docs-lead">
+        Byblos is your ePortfolio inside Moodle. You build <strong>pages</strong> out of
+        ready-made content blocks, gather related pages into a <strong>collection</strong>,
+        and then <strong>publish</strong> and <strong>share</strong> your work, with a teacher,
+        a whole class, or (where allowed) anyone with a private link. You can also
+        <strong>submit</strong> a page or collection for assessment.
+    </p>
+    <p>
+        New here? Start with <a href="{{{links.getting_started}}}">Getting started</a>,
+        then work through the guides below. If you already know what you want to achieve,
+        jump straight to one of the three use cases.
+    </p>
+
+    <figure class="byblos-docs-figure">
+        <img src="{{pix.portfolio_dashboard}}" class="byblos-docs-img" loading="lazy"
+             alt="The Byblos dashboard (My Portfolio) showing the Pages, Collections, Artefacts, Goals and Reviews tabs.">
+
+        <figcaption>Figure 1: The portfolio dashboard, your home base in Byblos.</figcaption>
+    </figure>
+
+    <h2>{{#str}}docs_group_guides, local_byblos{{/str}}</h2>
+    <p>Step-by-step instructions for each part of Byblos.</p>
+    <div class="byblos-docs-cards">
+        <a class="byblos-docs-card" href="{{{links.getting_started}}}">
+            <i class="fa fa-compass"></i>
+            <span class="byblos-docs-card-title">{{#str}}docs_topic_getting_started, local_byblos{{/str}}</span>
+            <span class="byblos-docs-card-desc">Find the dashboard, learn the key ideas, and see where everything lives.</span>
+        </a>
+        <a class="byblos-docs-card" href="{{{links.building_pages}}}">
+            <i class="fa fa-object-group"></i>
+            <span class="byblos-docs-card-title">{{#str}}docs_topic_building_pages, local_byblos{{/str}}</span>
+            <span class="byblos-docs-card-desc">Create a page from a template and add content blocks (sections).</span>
+        </a>
+        <a class="byblos-docs-card" href="{{{links.publishing}}}">
+            <i class="fa fa-check-circle"></i>
+            <span class="byblos-docs-card-title">{{#str}}docs_topic_publishing, local_byblos{{/str}}</span>
+            <span class="byblos-docs-card-desc">Move a page from draft to published, and back again.</span>
+        </a>
+        <a class="byblos-docs-card" href="{{{links.collections}}}">
+            <i class="fa fa-folder-open-o"></i>
+            <span class="byblos-docs-card-title">{{#str}}docs_topic_collections, local_byblos{{/str}}</span>
+            <span class="byblos-docs-card-desc">Group pages into a navigable mini-site, including shared group collections.</span>
+        </a>
+        <a class="byblos-docs-card" href="{{{links.goals}}}">
+            <i class="fa fa-bullseye"></i>
+            <span class="byblos-docs-card-title">{{#str}}docs_topic_goals, local_byblos{{/str}}</span>
+            <span class="byblos-docs-card-desc">Set learning goals, track progress, link evidence, and show them on a page.</span>
+        </a>
+        <a class="byblos-docs-card" href="{{{links.sharing}}}">
+            <i class="fa fa-share-alt"></i>
+            <span class="byblos-docs-card-title">{{#str}}docs_topic_sharing, local_byblos{{/str}}</span>
+            <span class="byblos-docs-card-desc">Share with a teacher, a class, or via a private public link.</span>
+        </a>
+        <a class="byblos-docs-card" href="{{{links.assessment}}}">
+            <i class="fa fa-graduation-cap"></i>
+            <span class="byblos-docs-card-title">{{#str}}docs_topic_assessment, local_byblos{{/str}}</span>
+            <span class="byblos-docs-card-desc">Submit for grading, and (for teachers) set up the assignment and peer review.</span>
+        </a>
+    </div>
+
+    <h2>{{#str}}docs_group_concepts, local_byblos{{/str}}</h2>
+    <p>The thinking behind ePortfolios, and how to build a good one.</p>
+    <div class="byblos-docs-cards">
+        <a class="byblos-docs-card byblos-docs-card-concept" href="{{{links.pedagogy}}}">
+            <i class="fa fa-lightbulb-o"></i>
+            <span class="byblos-docs-card-title">{{#str}}docs_topic_pedagogy, local_byblos{{/str}}</span>
+            <span class="byblos-docs-card-desc">Why the ePortfolio is a high-impact practice, reflection, integration, and learner agency, with sources.</span>
+        </a>
+        <a class="byblos-docs-card byblos-docs-card-concept" href="{{{links.best_practices}}}">
+            <i class="fa fa-check-square-o"></i>
+            <span class="byblos-docs-card-title">{{#str}}docs_topic_best_practices, local_byblos{{/str}}</span>
+            <span class="byblos-docs-card-desc">Ten high-level practices for building a portfolio that is curated, reflective and coherent.</span>
+        </a>
+    </div>
+
+    <h2>{{#str}}docs_group_usecases, local_byblos{{/str}}</h2>
+    <p>Complete walkthroughs for the three things people most often build with Byblos.</p>
+    <div class="byblos-docs-cards">
+        <a class="byblos-docs-card byblos-docs-card-usecase" href="{{{links.usecase_programme}}}">
+            <i class="fa fa-trophy"></i>
+            <span class="byblos-docs-card-title">{{#str}}docs_topic_usecase_programme, local_byblos{{/str}}</span>
+            <span class="byblos-docs-card-desc">A capstone portfolio drawing evidence from several courses to show what you have learned across a whole programme.</span>
+        </a>
+        <a class="byblos-docs-card byblos-docs-card-usecase" href="{{{links.usecase_course}}}">
+            <i class="fa fa-pencil-square-o"></i>
+            <span class="byblos-docs-card-title">{{#str}}docs_topic_usecase_course, local_byblos{{/str}}</span>
+            <span class="byblos-docs-card-desc">A portfolio submitted and graded as an assessment inside a single course.</span>
+        </a>
+        <a class="byblos-docs-card byblos-docs-card-usecase" href="{{{links.usecase_professional}}}">
+            <i class="fa fa-briefcase"></i>
+            <span class="byblos-docs-card-title">{{#str}}docs_topic_usecase_professional, local_byblos{{/str}}</span>
+            <span class="byblos-docs-card-desc">A polished showcase of your skills and projects to share with potential employers.</span>
+        </a>
+    </div>
+</div>

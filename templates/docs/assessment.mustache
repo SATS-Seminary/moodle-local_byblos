@@ -1,0 +1,119 @@
+{{!
+    @template local_byblos/docs/assessment
+
+    Guide: submitting a portfolio for assessment (assignsubmission_byblos),
+    teacher setup, and peer review.
+
+    Context variables:
+    - links (object) Map of topic key => URL.
+    - dashurl (string) Portfolio dashboard URL.
+    - newpageurl (string) New-page wizard URL.
+
+    @package    local_byblos
+    @copyright  2026 South African Theological Seminary
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+        "dashurl": "#",
+        "newpageurl": "#",
+        "pix": {"assignsub_byblos": "#", "byblos_submission_form": "#", "manage_peer_reviews": "#", "page_review": "#"},
+        "links": {
+            "index": "#", "getting_started": "#", "building_pages": "#",
+            "publishing": "#", "collections": "#", "sharing": "#",
+            "assessment": "#", "usecase_programme": "#", "usecase_course": "#",
+            "usecase_professional": "#"
+        }
+    }
+}}
+<div class="byblos-docs-article">
+
+    <h1>{{#str}}docs_topic_assessment, local_byblos{{/str}}</h1>
+    <p class="byblos-docs-lead">
+        When a teacher adds the <strong>Byblos portfolio</strong> submission type to a Moodle assignment,
+        students hand in a page or collection directly, no copying links into a text box. This guide
+        covers the teacher set-up, the student submission, and peer review.
+    </p>
+
+    <h2><span class="byblos-docs-role byblos-docs-role-teacher">For teachers</span> Setting up the assignment</h2>
+    <ol class="byblos-docs-steps">
+        <li>Add an <strong>Assignment</strong> activity to your course.</li>
+        <li>In the assignment settings, find <strong>Submission types</strong> and enable <strong>Byblos portfolio</strong>.</li>
+        <li>Configure the Byblos options (below) to match your task, then save.</li>
+    </ol>
+
+    <figure class="byblos-docs-figure">
+        <img src="{{pix.assignsub_byblos}}" class="byblos-docs-img" loading="lazy"
+             alt="The assignment Submission types area with Byblos portfolio ticked and its options expanded.">
+
+        <figcaption>Figure 1: Enabling the Byblos portfolio submission type.</figcaption>
+    </figure>
+
+    <p>The options that shape how the task works:</p>
+    <ul class="byblos-docs-deflist">
+        <li><strong>What students submit</strong>: a single page, a collection, or either. Choose a collection for multi-page or capstone work.</li>
+        <li><strong>Snapshot mode</strong>: how the submission is captured:
+            <ul>
+                <li><strong>Snapshot on submit</strong>: freezes a copy at the moment of submission. Fairest for grading: later edits don't change what you assessed. Recommended for summative tasks.</li>
+                <li><strong>Live</strong>: you always see the student's current page. Good for ongoing or formative work.</li>
+                <li><strong>Live until locked</strong>: live while the student can still edit, then frozen automatically when submissions lock (for example at the due date).</li>
+            </ul>
+        </li>
+        <li><strong>Peer review</strong>: optionally let students review each other (see below): assign reviewers manually, at random, or by group; set how many reviews each student does; choose when peer feedback becomes visible; and pick a scoring style (none, numeric, stars, or rubric).</li>
+        <li><strong>Advisory checklist</strong>: optional guidance points shown to students as they build, without being enforced.</li>
+    </ul>
+
+    <h2><span class="byblos-docs-role byblos-docs-role-student">For students</span> Submitting your portfolio</h2>
+    <ol class="byblos-docs-steps">
+        <li>Build your page or collection first (see <a href="{{{links.building_pages}}}">Building pages</a> and <a href="{{{links.collections}}}">Collections</a>), and <a href="{{{links.publishing}}}">publish</a> it.</li>
+        <li>Open the assignment in your course and click <strong>Add submission</strong>.</li>
+        <li>From the Byblos picker, choose the page or collection you want to hand in.</li>
+        <li>Save and then submit as you would any assignment.</li>
+    </ol>
+
+    <figure class="byblos-docs-figure">
+        <img src="{{pix.byblos_submission_form}}" class="byblos-docs-img" loading="lazy"
+             alt="The assignment submission form with the Byblos picker open, listing the student's pages and collections.">
+
+        <figcaption>Figure 2: Choosing what to submit.</figcaption>
+    </figure>
+
+    <div class="byblos-docs-note">
+        <strong>If the assignment uses "Snapshot on submit",</strong> a frozen copy is taken when you
+        submit. Editing your page afterwards will <em>not</em> change what your teacher grades, so make
+        sure it is ready before you submit. If in doubt, your teacher can tell you which snapshot mode
+        the task uses.
+    </div>
+
+    <h2><span class="byblos-docs-role byblos-docs-role-teacher">For teachers</span> Reading submissions</h2>
+    <p>
+        In the assignment's grading screen, each student's row shows what they submitted and whether it
+        is a snapshot or a live reference. Open the portfolio to read it with an inline comment overlay:
+        click into any section to leave feedback exactly where it applies, then grade as normal, including with a rubric if you set one.
+    </p>
+
+    <h2>Peer review</h2>
+    <p><span class="byblos-docs-role byblos-docs-role-student">For students</span> If peer review is on, your assigned reviews appear under the <strong>Reviews</strong> tab of your dashboard. Open a review to read a classmate's portfolio, leave inline comments, add a score if the task asks for one, and click <strong>{{#str}}peerreview_submit_btn, local_byblos{{/str}}</strong>.</p>
+
+    <figure class="byblos-docs-figure">
+        <img src="{{pix.page_review}}" class="byblos-docs-img" loading="lazy"
+             alt="The review screen showing a submitted portfolio with the inline comment overlay, the scoring control, and the Submit review button.">
+
+        <figcaption>Figure 3: Reviewing a peer's portfolio.</figcaption>
+    </figure>
+
+    <p><span class="byblos-docs-role byblos-docs-role-teacher">For teachers</span> When you choose manual peer assignment, open the assignment and use the <strong>Manage peer reviewers</strong> link to pair reviewers with reviewees. You will find it on the assignment page, in the assignment's actions ("More") menu, not on the grading screen, and its exact position can vary by theme. Random and group modes assign reviewers for you. The visibility setting controls whether students see peer feedback after the reviewer submits, only once grades are released, or never (teacher-only).</p>
+
+    <figure class="byblos-docs-figure">
+        <img src="{{pix.manage_peer_reviews}}" class="byblos-docs-img" loading="lazy"
+             alt="The Manage peer reviewers screen, where a teacher pairs reviewers with reviewees.">
+        <figcaption>Figure 4: Pairing reviewers with reviewees (manual mode).</figcaption>
+    </figure>
+
+    <h2>Use cases</h2>
+    <p>
+        For worked end-to-end examples see
+        <a href="{{{links.usecase_course}}}">Course summative assessment</a> and
+        <a href="{{{links.usecase_programme}}}">Programme exit portfolio</a>.
+    </p>
+</div>

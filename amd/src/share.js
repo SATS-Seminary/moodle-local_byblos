@@ -51,8 +51,42 @@ define([], function() {
         });
     }
 
+    /**
+     * Copy a field's value to the clipboard, with brief icon feedback.
+     *
+     * @param {HTMLElement} btn The copy button (data-byblos-copy = target input id).
+     */
+    function copyFrom(btn) {
+        var input = document.getElementById(btn.getAttribute('data-byblos-copy'));
+        if (!input) {
+            return;
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(input.value);
+        } else {
+            input.select();
+            document.execCommand('copy');
+        }
+        var icon = btn.querySelector('i');
+        if (icon) {
+            var prev = icon.className;
+            icon.className = 'fa fa-check';
+            setTimeout(function() {
+                icon.className = prev;
+            }, 1200);
+        }
+    }
+
     return {
         init: function() {
+            // Copy-to-clipboard for public share links.
+            document.querySelectorAll('.byblos-share-copy').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    copyFrom(btn);
+                });
+            });
+
+            // Share-type picker: swap the value control to match the selected type.
             var typeSelect = document.getElementById('byblos-sharetype');
             if (!typeSelect) {
                 return;

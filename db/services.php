@@ -232,4 +232,153 @@ $functions = [
         'ajax'         => true,
         'capabilities' => 'local/byblos:use',
     ],
+
+    // Goals: first-class learning-goal store (self-regulated-learning loop).
+
+    'local_byblos_create_goal' => [
+        'classname'    => \local_byblos\external\goal_external::class,
+        'methodname'   => 'create_goal',
+        'description'  => 'Create a learning goal for the current user.',
+        'type'         => 'write',
+        'ajax'         => true,
+        'capabilities' => 'local/byblos:managegoals',
+    ],
+
+    'local_byblos_update_goal' => [
+        'classname'    => \local_byblos\external\goal_external::class,
+        'methodname'   => 'update_goal',
+        'description'  => 'Update a learning goal (title, description, status, progress, target date).',
+        'type'         => 'write',
+        'ajax'         => true,
+        'capabilities' => 'local/byblos:managegoals',
+    ],
+
+    'local_byblos_delete_goal' => [
+        'classname'    => \local_byblos\external\goal_external::class,
+        'methodname'   => 'delete_goal',
+        'description'  => 'Delete a learning goal and its evidence links.',
+        'type'         => 'write',
+        'ajax'         => true,
+        'capabilities' => 'local/byblos:managegoals',
+    ],
+
+    'local_byblos_reorder_goals' => [
+        'classname'    => \local_byblos\external\goal_external::class,
+        'methodname'   => 'reorder_goals',
+        'description'  => 'Reorder the current user\'s goals.',
+        'type'         => 'write',
+        'ajax'         => true,
+        'capabilities' => 'local/byblos:managegoals',
+    ],
+
+    'local_byblos_add_goal_link' => [
+        'classname'    => \local_byblos\external\goal_external::class,
+        'methodname'   => 'add_goal_link',
+        'description'  => 'Link an artefact or page as evidence for a goal.',
+        'type'         => 'write',
+        'ajax'         => true,
+        'capabilities' => 'local/byblos:managegoals',
+    ],
+
+    'local_byblos_remove_goal_link' => [
+        'classname'    => \local_byblos\external\goal_external::class,
+        'methodname'   => 'remove_goal_link',
+        'description'  => 'Remove an evidence link from a goal.',
+        'type'         => 'write',
+        'ajax'         => true,
+        'capabilities' => 'local/byblos:managegoals',
+    ],
+
+    'local_byblos_list_goals' => [
+        'classname'    => \local_byblos\external\goal_external::class,
+        'methodname'   => 'list_goals',
+        'description'  => 'List a user\'s goals (self, or a student\'s if you can view shared work).',
+        'type'         => 'read',
+        'ajax'         => true,
+        'capabilities' => 'local/byblos:use',
+    ],
+
+    // Page feedback: logged-in, owner-moderated feedback on shared pages.
+
+    'local_byblos_set_page_feedback_mode' => [
+        'classname'    => \local_byblos\external\feedback_external::class,
+        'methodname'   => 'set_page_feedback_mode',
+        'description'  => 'Set the feedback mode (off|teachers|cohort) for one of your pages.',
+        'type'         => 'write',
+        'ajax'         => true,
+        'capabilities' => 'local/byblos:createpage',
+    ],
+
+    'local_byblos_add_page_feedback' => [
+        'classname'    => \local_byblos\external\feedback_external::class,
+        'methodname'   => 'add_page_feedback',
+        'description'  => 'Leave feedback on a shared page (logged-in, scope-gated).',
+        'type'         => 'write',
+        'ajax'         => true,
+        'capabilities' => 'local/byblos:leavefeedback',
+    ],
+
+    'local_byblos_edit_page_feedback' => [
+        'classname'    => \local_byblos\external\feedback_external::class,
+        'methodname'   => 'edit_page_feedback',
+        'description'  => 'Edit your own page-feedback comment.',
+        'type'         => 'write',
+        'ajax'         => true,
+    ],
+
+    'local_byblos_delete_page_feedback' => [
+        'classname'    => \local_byblos\external\feedback_external::class,
+        'methodname'   => 'delete_page_feedback',
+        'description'  => 'Delete a page-feedback comment (author or page owner).',
+        'type'         => 'write',
+        'ajax'         => true,
+    ],
+
+    'local_byblos_set_feedback_visibility' => [
+        'classname'    => \local_byblos\external\feedback_external::class,
+        'methodname'   => 'set_feedback_visibility',
+        'description'  => 'Hide or show a page-feedback comment (page owner moderation).',
+        'type'         => 'write',
+        'ajax'         => true,
+    ],
+
+    'local_byblos_list_page_feedback' => [
+        'classname'    => \local_byblos\external\feedback_external::class,
+        'methodname'   => 'list_page_feedback',
+        'description'  => 'List feedback on a page (owner sees hidden rows too).',
+        'type'         => 'read',
+        'ajax'         => true,
+        'capabilities' => 'local/byblos:use',
+    ],
+
+    // Outcome map: optional competency-framework import (when competencies enabled).
+
+    'local_byblos_list_competency_frameworks' => [
+        'classname'    => \local_byblos\external\competency_external::class,
+        'methodname'   => 'list_competency_frameworks',
+        'description'  => 'List competency frameworks (only when site competencies are enabled).',
+        'type'         => 'read',
+        'ajax'         => true,
+        'capabilities' => 'local/byblos:createpage',
+    ],
+
+    'local_byblos_list_framework_competencies' => [
+        'classname'    => \local_byblos\external\competency_external::class,
+        'methodname'   => 'list_framework_competencies',
+        'description'  => 'List competencies within a framework (only when site competencies are enabled).',
+        'type'         => 'read',
+        'ajax'         => true,
+        'capabilities' => 'local/byblos:createpage',
+    ],
+
+    // Reflection section: save body + recorded media (draft file area handling).
+
+    'local_byblos_save_reflection' => [
+        'classname'    => \local_byblos\external\section_external::class,
+        'methodname'   => 'save_reflection',
+        'description'  => 'Save a reflection section\'s heading, framework and rich body (with recorded media).',
+        'type'         => 'write',
+        'ajax'         => true,
+        'capabilities' => 'local/byblos:createpage',
+    ],
 ];

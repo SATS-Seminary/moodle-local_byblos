@@ -24,8 +24,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2026052208;        // YYYYMMDDXX format.
+$plugin->version   = 2026060900;        // YYYYMMDDXX format.
 $plugin->requires  = 2024100700;        // Moodle 5.0+.
 $plugin->component = 'local_byblos';
 $plugin->maturity  = MATURITY_BETA;
-$plugin->release   = '1.0.1';
+$plugin->release   = '1.2.1';

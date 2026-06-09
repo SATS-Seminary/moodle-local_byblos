@@ -1,0 +1,106 @@
+{{!
+    @template local_byblos/docs/collections
+
+    Guide: creating collections, the home page, reordering, group collections.
+
+    Context variables:
+    - links (object) Map of topic key => URL.
+    - dashurl (string) Portfolio dashboard URL.
+    - newpageurl (string) New-page wizard URL.
+
+    @package    local_byblos
+    @copyright  2026 South African Theological Seminary
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+        "dashurl": "#",
+        "newpageurl": "#",
+        "pix": {"collections_tab": "#", "collection_view": "#"},
+        "links": {
+            "index": "#", "getting_started": "#", "building_pages": "#",
+            "publishing": "#", "collections": "#", "sharing": "#",
+            "assessment": "#", "usecase_programme": "#", "usecase_course": "#",
+            "usecase_professional": "#"
+        }
+    }
+}}
+<div class="byblos-docs-article">
+
+    <h1>{{#str}}docs_topic_collections, local_byblos{{/str}}</h1>
+    <p class="byblos-docs-lead">
+        A collection turns several pages into a small website with its own navigation. It is the
+        right container whenever your portfolio is more than one page, a capstone with a page per
+        outcome, or a project with separate case studies.
+    </p>
+
+    <h2>Creating a collection</h2>
+    <ol class="byblos-docs-steps">
+        <li>On the dashboard, open the <strong>{{#str}}nav_collections, local_byblos{{/str}}</strong> tab.</li>
+        <li>In the <strong>{{#str}}newcollection, local_byblos{{/str}}</strong> form, enter a title and an optional description.</li>
+        <li>If you belong to any groups, you can optionally bind the collection to one, see <a href="#group-collections">group collections</a> below. Leave it as <strong>{{#str}}collection_group_personal, local_byblos{{/str}}</strong> for a personal collection.</li>
+        <li>Click <strong>{{#str}}createcollection, local_byblos{{/str}}</strong>.</li>
+    </ol>
+
+    <figure class="byblos-docs-figure">
+        <img src="{{pix.collections_tab}}" class="byblos-docs-img" loading="lazy"
+             alt="The Collections tab showing the New collection form above existing collection cards.">
+
+        <figcaption>Figure 1: Creating a collection.</figcaption>
+    </figure>
+
+    <h2>Adding pages</h2>
+    <ol class="byblos-docs-steps">
+        <li>Open the collection (click its card on the Collections tab).</li>
+        <li>Under <strong>{{#str}}addpages, local_byblos{{/str}}</strong>, you will see your own pages that are not yet in the collection.</li>
+        <li>Click a page to add it. It joins the end of the running order.</li>
+    </ol>
+
+    <h2>The home page and ordering</h2>
+    <p>
+        The first page in a collection is its <strong>home page</strong>: the one a visitor sees first, and
+        where a "preview collection" link starts. You control the order and the home page from each
+        page card:
+    </p>
+    <ul class="byblos-docs-deflist">
+        <li><strong>Reorder</strong>: use the up/down arrows on a page card.</li>
+        <li><strong>Set the home page</strong>: click <strong>{{#str}}collection_make_home, local_byblos{{/str}}</strong> on the page you want first. It carries the <em>{{#str}}collection_home_badge, local_byblos{{/str}}</em> badge.</li>
+        <li><strong>Remove</strong>: take a page out of the collection (the page itself is not deleted).</li>
+    </ul>
+
+    <figure class="byblos-docs-figure">
+        <img src="{{pix.collection_view}}" class="byblos-docs-img" loading="lazy"
+             alt="A collection view with ordered page cards; the first shows the Home page badge, with reorder and Make home page controls.">
+
+        <figcaption>Figure 2: Ordering pages and choosing the home page.</figcaption>
+    </figure>
+
+    <h2>Navigation between pages</h2>
+    <p>
+        Once a page belongs to a collection, viewers get an automatic navigation strip across the
+        collection's pages. For navigation <em>inside</em> a page, tabs, pills, cards or
+        previous/next links, add a <strong>Page navigation</strong> section (see
+        <a href="{{{links.building_pages}}}">Building pages</a>). You can also add pages to a collection
+        directly from the editor using the <strong>{{#str}}addtocollection, local_byblos{{/str}}</strong> control.
+    </p>
+
+    <h2 id="group-collections">Group collections</h2>
+    <p>
+        A collection can be tied to a Moodle <strong>group</strong>, turning it into a shared canvas for
+        team or cohort work.
+    </p>
+    <div class="byblos-docs-note">
+        {{#str}}collection_group_hint, local_byblos{{/str}}
+    </div>
+    <ul class="byblos-docs-deflist">
+        <li><strong>Anyone in the group</strong> can add their own pages, reorder, and remove their own contributions.</li>
+        <li><strong>Only the creator</strong> can rename or delete the collection, or change its sharing.</li>
+        <li>Each page still belongs to the student who made it, group membership lets people contribute, not edit each other's pages.</li>
+    </ul>
+
+    <h2>Next</h2>
+    <p>
+        A collection is shared as a single unit, share it once and viewers can navigate every page
+        inside it. See <a href="{{{links.sharing}}}">Sharing</a>.
+    </p>
+</div>

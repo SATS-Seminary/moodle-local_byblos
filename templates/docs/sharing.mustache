@@ -1,0 +1,122 @@
+{{!
+    @template local_byblos/docs/sharing
+
+    Guide: sharing pages and collections (user / course / group / public).
+
+    Context variables:
+    - links (object) Map of topic key => URL.
+    - dashurl (string) Portfolio dashboard URL.
+    - newpageurl (string) New-page wizard URL.
+
+    @package    local_byblos
+    @copyright  2026 South African Theological Seminary
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+        "dashurl": "#",
+        "newpageurl": "#",
+        "pix": {"manage_sharing": "#"},
+        "links": {
+            "index": "#", "getting_started": "#", "building_pages": "#",
+            "publishing": "#", "collections": "#", "sharing": "#",
+            "assessment": "#", "pedagogy": "#", "best_practices": "#",
+            "usecase_programme": "#", "usecase_course": "#",
+            "usecase_professional": "#"
+        }
+    }
+}}
+<div class="byblos-docs-article">
+
+    <h1>{{#str}}docs_topic_sharing, local_byblos{{/str}}</h1>
+    <p class="byblos-docs-lead">
+        Sharing decides <em>who</em> can see your work. You can share a single page or a whole
+        collection with one person, a whole course, a group, or, where your site allows it, anyone holding a private link. Remember to <a href="{{{links.publishing}}}">publish</a> too;
+        sharing a draft shows the viewer nothing.
+    </p>
+
+    <h2>Opening the share screen</h2>
+    <ol class="byblos-docs-steps">
+        <li>Open the page, and click <strong>{{#str}}sharethispage, local_byblos{{/str}}</strong>; or open the collection and click <strong>{{#str}}sharethiscollection, local_byblos{{/str}}</strong>.</li>
+        <li>The sharing screen lists who already has access and lets you add more.</li>
+    </ol>
+
+    <figure class="byblos-docs-figure">
+        <img src="{{pix.manage_sharing}}" class="byblos-docs-img" loading="lazy"
+             alt="The Manage sharing screen with the share-type selector, the scoped picker, and a table of existing shares.">
+
+        <figcaption>Figure 1: The sharing screen with its scoped pickers.</figcaption>
+    </figure>
+
+    <h2>Choosing who to share with</h2>
+    <p>Pick a share type, then choose from the list, Byblos only offers people and places you are actually connected to, so there are no IDs to look up:</p>
+    <ul class="byblos-docs-deflist">
+        <li><strong>{{#str}}share_user, local_byblos{{/str}}</strong>: one named person from the courses you share. Use this to share with an individual teacher or assessor.</li>
+        <li><strong>{{#str}}share_course, local_byblos{{/str}}</strong>: everyone enrolled in a course you choose. Use this to share with a whole class or cohort.</li>
+        <li><strong>{{#str}}share_group, local_byblos{{/str}}</strong>: everyone in one of your groups.</li>
+        <li><strong>{{#str}}share_public, local_byblos{{/str}}</strong>: generates a secret link. <em>{{#str}}share_public_hint, local_byblos{{/str}}</em> Use this for people outside Moodle, such as an employer. (Available only if your site enables public sharing.)</li>
+    </ul>
+
+    <div class="byblos-docs-tip">
+        <strong>Sharing a teacher into your work.</strong> To hand a single teacher access, choose
+        <strong>{{#str}}share_user, local_byblos{{/str}}</strong> and pick their name. To let an entire
+        class see it (for example a peer showcase), choose
+        <strong>{{#str}}share_course, local_byblos{{/str}}</strong>.
+    </div>
+
+    <h2>Collections share as one unit</h2>
+    <p>
+        Share a collection and the viewer can open every page inside it through the collection's
+        navigation, you do not have to share each page separately. This is the tidiest way to give an
+        assessor a multi-page portfolio.
+    </p>
+
+    <h2>Revoking access</h2>
+    <ol class="byblos-docs-steps">
+        <li>Open the share screen for the page or collection.</li>
+        <li>In the list of existing shares, click <strong>{{#str}}share_revoke, local_byblos{{/str}}</strong> on the entry you want to remove.</li>
+        <li>Confirm. That person, course, group, or link immediately loses access.</li>
+    </ol>
+
+    <h2>Public links explained</h2>
+    <p>
+        A public share creates a long, unguessable URL that opens a clean, read-only view of your page
+        or collection, no Moodle login required. Anyone you give the link to can view it, so treat it
+        like a password: share it deliberately, and revoke it when it is no longer needed.
+    </p>
+
+    <div class="byblos-docs-note">
+        <strong>What viewers see.</strong> Shared viewers see the published content only, never your
+        editing controls, and never your drafts. You can check this yourself with "preview as viewer".
+    </div>
+
+    <h2>Inviting feedback on a page</h2>
+    <p>
+        Portfolios improve through dialogue, so you can let the people you share a page with leave
+        feedback directly on it. At the bottom of one of your own pages, use the
+        <strong>{{#str}}feedback_heading, local_byblos{{/str}}</strong> control to choose who may comment:
+    </p>
+    <ul class="byblos-docs-deflist">
+        <li><strong>{{#str}}feedback_mode_off, local_byblos{{/str}}</strong>: no feedback (the default).</li>
+        <li><strong>{{#str}}feedback_mode_teachers, local_byblos{{/str}}</strong>: only teachers (staff who can view shared work) may comment.</li>
+        <li><strong>{{#str}}feedback_mode_cohort, local_byblos{{/str}}</strong>: everyone in the course or group you shared the page with may comment, so a whole learning cohort can respond.</li>
+    </ul>
+    <p>
+        Feedback is always attributed (there is no anonymous or public feedback), and a teacher's comment
+        carries a teacher badge. As the page owner you moderate: you can <strong>hide</strong> or
+        <strong>delete</strong> any comment, and anyone can delete their own.
+    </p>
+
+    <div class="byblos-docs-tip">
+        <strong>Use it to revise.</strong> Frequent, constructive feedback is one of the conditions that
+        makes an ePortfolio a high-impact practice (see <a href="{{{links.best_practices}}}">Best
+        practices</a>). Turn feedback on while a page is a work in progress, gather responses, then act on
+        them, that loop is where a lot of the learning happens.
+    </div>
+
+    <h2>Next</h2>
+    <p>
+        If your work is being graded, you may submit it through an assignment instead of (or as well as)
+        sharing, see <a href="{{{links.assessment}}}">Submitting for assessment</a>.
+    </p>
+</div>

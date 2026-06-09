@@ -57,7 +57,7 @@
             </button>
             {{#is_draft}}
             <form method="post" action="{{publishurl}}" class="d-inline mr-2"
-                  onsubmit="return confirm('{{#str}}confirmpublishpage, local_byblos{{/str}}');">
+                  data-byblos-confirm="{{#str}}confirmpublishpage, local_byblos{{/str}}">
                 <input type="hidden" name="sesskey" value="{{sesskey}}">
                 <input type="hidden" name="id" value="{{pageid}}">
                 <input type="hidden" name="action" value="publish">
@@ -69,7 +69,7 @@
             {{/is_draft}}
             {{^is_draft}}
             <form method="post" action="{{publishurl}}" class="d-inline mr-2"
-                  onsubmit="return confirm('{{#str}}confirmreverttodraft, local_byblos{{/str}}');">
+                  data-byblos-confirm="{{#str}}confirmreverttodraft, local_byblos{{/str}}">
                 <input type="hidden" name="sesskey" value="{{sesskey}}">
                 <input type="hidden" name="id" value="{{pageid}}">
                 <input type="hidden" name="action" value="draft">

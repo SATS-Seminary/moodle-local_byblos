@@ -89,10 +89,40 @@ class section_renderer {
                 return section_helpers::render_youtube($cfg);
             case 'pagenav':
                 return section_helpers::render_pagenav($cfg, (int) ($section->pageid ?? 0));
+            case 'reflection':
+                $rowner = self::resolve_owner_id($section);
+                return section_helpers::render_reflection(
+                    $cfg,
+                    (int) $section->id,
+                    \context_user::instance($rowner)->id
+                );
+            case 'alignment':
+                return section_helpers::render_alignment($cfg, self::resolve_owner_id($section));
+            case 'goals':
+                return section_helpers::render_goals($cfg, self::resolve_owner_id($section));
             default:
                 return '<div class="alert alert-warning">Unknown section type: '
                     . s($section->sectiontype) . '</div>';
         }
+    }
+
+    /**
+     * Resolve the page-owner user id for a section (falls back to the current user).
+     *
+     * @param \stdClass $section
+     * @return int
+     */
+    private static function resolve_owner_id(\stdClass $section): int {
+        global $USER;
+
+        $pageid = (int) ($section->pageid ?? 0);
+        if ($pageid) {
+            $page = page::get($pageid);
+            if ($page) {
+                return (int) $page->userid;
+            }
+        }
+        return (int) $USER->id;
     }
 
     /**
@@ -158,7 +188,7 @@ class section_renderer {
             $html .= '<h2 style="margin-bottom:0.75rem !important;">' . s($heading) . '</h2>';
         }
         if ($body !== '') {
-            $html .= '<div class="section-body">' . $body . '</div>';
+            $html .= '<div class="section-body">' . section_helpers::clean_body($body) . '</div>';
         } else {
             $html .= '<p class="text-muted"><em>Click Edit to add content...</em></p>';
         }
@@ -199,7 +229,7 @@ class section_renderer {
             $html .= '<h3 style="margin-bottom:0.5rem !important;">' . s($heading) . '</h3>';
         }
         if ($body !== '') {
-            $html .= '<div>' . $body . '</div>';
+            $html .= '<div>' . section_helpers::clean_body($body) . '</div>';
         }
         $html .= '</div>';
         $html .= '<div class="col-md-6 ' . $imageorder . '" style="padding:1rem !important;">'

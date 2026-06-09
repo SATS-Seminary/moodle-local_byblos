@@ -50,7 +50,7 @@ header('Content-Type: application/json; charset=utf-8');
  * @param int    $code    HTTP status code.
  * @return never
  */
-function byblos_upload_error(string $message, int $code = 400): never {
+function local_byblos_upload_error(string $message, int $code = 400): never {
     http_response_code($code);
     echo json_encode(['error' => $message], JSON_THROW_ON_ERROR);
     die();
@@ -58,7 +58,7 @@ function byblos_upload_error(string $message, int $code = 400): never {
 
 // Validate request method.
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    byblos_upload_error('Only POST requests are accepted.', 405);
+    local_byblos_upload_error('Only POST requests are accepted.', 405);
 }
 
 // Validate capability.
@@ -71,26 +71,26 @@ $pageid = required_param('pageid', PARAM_INT);
 // Validate the page exists and user owns it.
 $page = page::get($pageid);
 if (!$page) {
-    byblos_upload_error('Page not found.', 404);
+    local_byblos_upload_error('Page not found.', 404);
 }
 if ((int) $page->userid !== (int) $USER->id) {
-    byblos_upload_error('You do not own this page.', 403);
+    local_byblos_upload_error('You do not own this page.', 403);
 }
 
 // Validate file upload.
 if (empty($_FILES['file'])) {
-    byblos_upload_error('No file was uploaded.');
+    local_byblos_upload_error('No file was uploaded.');
 }
 
 $file = $_FILES['file'];
 
 if ($file['error'] !== UPLOAD_ERR_OK) {
-    byblos_upload_error('Upload failed with error code ' . $file['error'] . '.');
+    local_byblos_upload_error('Upload failed with error code ' . $file['error'] . '.');
 }
 
 // Check file size (10 MB max).
 if ($file['size'] > file_manager::MAX_UPLOAD_BYTES) {
-    byblos_upload_error('File exceeds maximum size of ' . display_size(file_manager::MAX_UPLOAD_BYTES) . '.');
+    local_byblos_upload_error('File exceeds maximum size of ' . display_size(file_manager::MAX_UPLOAD_BYTES) . '.');
 }
 
 // Validate MIME type (image/* only).
@@ -100,7 +100,7 @@ $mimetype = $finfo->file($file['tmp_name']);
 try {
     file_manager::validate_image_mime($mimetype);
 } catch (\moodle_exception $e) {
-    byblos_upload_error('Invalid file type. Only images are allowed (got: ' . $mimetype . ').');
+    local_byblos_upload_error('Invalid file type. Only images are allowed (got: ' . $mimetype . ').');
 }
 
 // Store the file.
@@ -113,7 +113,7 @@ try {
         $mimetype,
     );
 } catch (\Throwable $e) {
-    byblos_upload_error('Failed to store file: ' . $e->getMessage(), 500);
+    local_byblos_upload_error('Failed to store file: ' . $e->getMessage(), 500);
 }
 
 // Build response.

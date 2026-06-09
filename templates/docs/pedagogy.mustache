@@ -1,0 +1,300 @@
+{{!
+    @template local_byblos/docs/pedagogy
+
+    Concept page: the pedagogical thinking behind ePortfolios, grounded in
+    published scholarship, with an accurate reference list.
+
+    Context variables:
+    - links (object) Map of topic key => URL.
+    - dashurl (string) Portfolio dashboard URL.
+    - newpageurl (string) New-page wizard URL.
+
+    @package    local_byblos
+    @copyright  2026 South African Theological Seminary
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+        "dashurl": "#",
+        "newpageurl": "#",
+        "links": {
+            "index": "#", "getting_started": "#", "building_pages": "#",
+            "publishing": "#", "collections": "#", "sharing": "#",
+            "assessment": "#", "pedagogy": "#", "best_practices": "#",
+            "usecase_programme": "#", "usecase_course": "#",
+            "usecase_professional": "#"
+        }
+    }
+}}
+<div class="byblos-docs-article">
+
+    <h1>{{#str}}docs_topic_pedagogy, local_byblos{{/str}}</h1>
+    <p class="byblos-docs-lead">
+        A portfolio is not a folder of files. Done well, it is one of the most powerful things a learner
+        can do, which is why the Association of American Colleges &amp; Universities
+        (AAC&amp;U) names the
+        ePortfolio a <strong>high-impact educational practice</strong>. This page explains the ideas that make
+        portfolios work, and how Byblos is built around them. The
+        <a href="{{{links.best_practices}}}">Best practices</a> page turns these ideas into concrete advice.
+    </p>
+
+    <h2>More than storage: create, collect, curate, connect, and reflect</h2>
+    <p>
+        An ePortfolio gives learners a space to <strong>create, collect, curate and connect</strong> their
+        academic experiences, and to write reflectively about them (Ohio State University, no date a). Its real
+        job is to help students "connect the dots" across a curriculum that is otherwise experienced as
+        separate, disconnected courses, making learning visible and turning a pile of work into a story
+        about a person who is learning.
+    </p>
+
+    <figure class="byblos-docs-figure">
+        <div class="byblos-docs-diagram">
+            <svg class="bd-cyc" viewBox="0 0 760 480" role="img" aria-labelledby="bd-cyc-t bd-cyc-d"
+                xmlns="http://www.w3.org/2000/svg">
+                <title id="bd-cyc-t">The portfolio cycle</title>
+                <desc id="bd-cyc-d">A continuous clockwise cycle of four stages, Collect, Curate,
+                    Connect and Share, circling a central hub labelled Reflection, which feeds every
+                    stage.</desc>
+                <defs>
+                    <linearGradient id="bdHub" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0" stop-color="#ffb84d"/>
+                        <stop offset="1" stop-color="#e8590c"/>
+                    </linearGradient>
+                    <marker id="bdArrow" markerWidth="14" markerHeight="14" refX="7" refY="5"
+                        orient="auto" markerUnits="userSpaceOnUse">
+                        <path d="M0,0 L10,5 L0,10 Z" fill="#adb5bd"/>
+                    </marker>
+                    <filter id="bdShadow" x="-40%" y="-40%" width="180%" height="180%">
+                        <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000"
+                            flood-opacity="0.18"/>
+                    </filter>
+                    <style>
+                        .bd-cyc text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                            Roboto, Helvetica, Arial, sans-serif; }
+                        .bd-cyc .bd-t { font-weight: 700; font-size: 16px; fill: #fff; }
+                        .bd-cyc .bd-d { font-size: 10px; fill: #fff; fill-opacity: .92; }
+                        .bd-cyc .bd-hub-t { font-weight: 800; font-size: 18px; fill: #fff;
+                            letter-spacing: .5px; }
+                        .bd-cyc .bd-hub-d { font-size: 11.5px; fill: #fff; fill-opacity: .92; }
+                        .bd-cyc .bd-num { font-weight: 700; font-size: 12px; }
+                    </style>
+                </defs>
+
+                <!-- continuous-cycle track -->
+                <circle cx="380" cy="240" r="190" fill="none" stroke="#f1f3f5" stroke-width="16"/>
+
+                <!-- clockwise flow arrows between stages -->
+                <g fill="none" stroke="#adb5bd" stroke-width="3" marker-end="url(#bdArrow)">
+                    <path d="M445.0,61.4 A190,190 0 0 1 558.6,175.0"/>
+                    <path d="M558.6,305.0 A190,190 0 0 1 445.0,418.6"/>
+                    <path d="M315.0,418.6 A190,190 0 0 1 201.4,305.0"/>
+                    <path d="M201.4,175.0 A190,190 0 0 1 315.0,61.4"/>
+                </g>
+
+                <!-- reflection radiates into every stage -->
+                <g stroke="#f59f00" stroke-width="2" stroke-dasharray="3 4" stroke-linecap="round">
+                    <line x1="380" y1="166" x2="380" y2="100"/>
+                    <line x1="454" y1="240" x2="520" y2="240"/>
+                    <line x1="380" y1="314" x2="380" y2="380"/>
+                    <line x1="306" y1="240" x2="240" y2="240"/>
+                </g>
+
+                <!-- central hub: reflection -->
+                <g filter="url(#bdShadow)">
+                    <circle cx="380" cy="240" r="74" fill="url(#bdHub)"/>
+                </g>
+                <g transform="translate(380,240)">
+                    <g fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="0" cy="-30" r="12"/>
+                        <path d="M-4,-32 L0,-27 L4,-32"/>
+                        <line x1="0" y1="-27" x2="0" y2="-22"/>
+                    </g>
+                    <g stroke="#fff" stroke-width="2" stroke-linecap="round">
+                        <line x1="-6" y1="-16" x2="6" y2="-16"/>
+                        <line x1="-4" y1="-12" x2="4" y2="-12"/>
+                    </g>
+                    <text class="bd-hub-t" text-anchor="middle" y="12">REFLECTION</text>
+                    <text class="bd-hub-d" text-anchor="middle" y="30">the engine</text>
+                </g>
+
+                <!-- stage 1: Collect (top) -->
+                <g transform="translate(380,50)">
+                    <circle r="50" fill="#1c7ed6" filter="url(#bdShadow)"/>
+                    <g transform="translate(0,-16)" fill="none" stroke="#fff" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="0" y1="-10" x2="0" y2="2"/>
+                        <path d="M-5,-2 L0,4 L5,-2" fill="#fff" stroke="none"/>
+                        <path d="M-12,2 V6 a2,2 0 0 0 2,2 H10 a2,2 0 0 0 2,-2 V2"/>
+                    </g>
+                    <text class="bd-t" text-anchor="middle" y="12">Collect</text>
+                    <text class="bd-d" text-anchor="middle" y="28">gather evidence</text>
+                    <circle cx="0" cy="-50" r="12" fill="#fff" stroke="#1c7ed6" stroke-width="2"/>
+                    <text class="bd-num" text-anchor="middle" y="-46" fill="#1c7ed6">1</text>
+                </g>
+
+                <!-- stage 2: Curate (right) -->
+                <g transform="translate(570,240)">
+                    <circle r="50" fill="#0ca678" filter="url(#bdShadow)"/>
+                    <g transform="translate(0,-16)">
+                        <polygon fill="#fff" points="0,-12 2.94,-4.05 11.4,-3.7 4.76,1.55 7.05,9.7
+                            0,5 -7.05,9.7 -4.76,1.55 -11.4,-3.7 -2.94,-4.05"/>
+                    </g>
+                    <text class="bd-t" text-anchor="middle" y="12">Curate</text>
+                    <text class="bd-d" text-anchor="middle" y="28">pick your best</text>
+                    <circle cx="0" cy="-50" r="12" fill="#fff" stroke="#0ca678" stroke-width="2"/>
+                    <text class="bd-num" text-anchor="middle" y="-46" fill="#0ca678">2</text>
+                </g>
+
+                <!-- stage 3: Connect (bottom) -->
+                <g transform="translate(380,430)">
+                    <circle r="50" fill="#7048e8" filter="url(#bdShadow)"/>
+                    <g transform="translate(0,-16)">
+                        <g stroke="#fff" stroke-width="2" stroke-linecap="round">
+                            <line x1="0" y1="-9" x2="-9" y2="8"/>
+                            <line x1="0" y1="-9" x2="9" y2="8"/>
+                            <line x1="-9" y1="8" x2="9" y2="8"/>
+                        </g>
+                        <g fill="#fff">
+                            <circle cx="0" cy="-9" r="3.5"/>
+                            <circle cx="-9" cy="8" r="3.5"/>
+                            <circle cx="9" cy="8" r="3.5"/>
+                        </g>
+                    </g>
+                    <text class="bd-t" text-anchor="middle" y="12">Connect</text>
+                    <text class="bd-d" text-anchor="middle" y="28">make meaning</text>
+                    <circle cx="0" cy="-50" r="12" fill="#fff" stroke="#7048e8" stroke-width="2"/>
+                    <text class="bd-num" text-anchor="middle" y="-46" fill="#7048e8">3</text>
+                </g>
+
+                <!-- stage 4: Share (left) -->
+                <g transform="translate(190,240)">
+                    <circle r="50" fill="#e64980" filter="url(#bdShadow)"/>
+                    <g transform="translate(0,-16)">
+                        <g stroke="#fff" stroke-width="2" stroke-linecap="round">
+                            <line x1="-9" y1="0" x2="9" y2="-9"/>
+                            <line x1="-9" y1="0" x2="9" y2="9"/>
+                        </g>
+                        <g fill="#fff">
+                            <circle cx="-9" cy="0" r="3.5"/>
+                            <circle cx="9" cy="-9" r="3.5"/>
+                            <circle cx="9" cy="9" r="3.5"/>
+                        </g>
+                    </g>
+                    <text class="bd-t" text-anchor="middle" y="12">Share</text>
+                    <text class="bd-d" text-anchor="middle" y="28">publish &amp; show</text>
+                    <circle cx="0" cy="-50" r="12" fill="#fff" stroke="#e64980" stroke-width="2"/>
+                    <text class="bd-num" text-anchor="middle" y="-46" fill="#e64980">4</text>
+                </g>
+            </svg>
+        </div>
+        <figcaption>Figure 1: The portfolio cycle: collect, curate, connect and share, with
+            reflection at its core.</figcaption>
+    </figure>
+
+    <h2>Reflection is the engine</h2>
+    <p>
+        Across the literature, <strong>reflection sits at the core of portfolio learning</strong>
+        (Yancey, 2009). Reflection is what drives <strong>metacognition</strong>, i.e. "thinking about your
+        own thinking", so that students become aware of <em>how</em> they learn and how their
+        understanding has changed over time. That awareness is associated with higher-order thinking and
+        deeper learning, not just the recall of content (Wolf et al., 2022). The artefact
+        shows <em>what</em> you did; the reflection beside it shows what it <em>means</em>, and that is
+        where the learning happens.
+    </p>
+
+    <h2>Integration: making meaning across courses</h2>
+    <p>
+        Because artefacts in a portfolio are not locked to a single course, students can
+        <strong>synthesise and integrate learning across courses and experiences to find meaning</strong>
+        in the whole, not just the parts. This integrative move is one of the clearest benefits of the
+        ePortfolio: it asks the learner to stand back and ask "what does all of this add up to?", which is
+        exactly the question a capstone or exit portfolio is built around (see the
+        <a href="{{{links.usecase_programme}}}">programme exit portfolio</a> walkthrough).
+    </p>
+
+    <h2>Two faces: portfolio <em>for</em> learning and portfolio <em>of</em> learning</h2>
+    <p>
+        Portfolios serve more than one purpose, and good practice begins by being clear about which one
+        you mean. Researchers distinguish portfolios used for <strong>learning</strong>, for
+        <strong>assessment</strong>, and for <strong>professional development</strong>, and warn that
+        conflating these purposes weakens all of them (Smith and Tillema, 2006). Barrett (2010) frames
+        the same tension as the <strong>"two faces" of the ePortfolio</strong>: the
+        <em>workspace</em> (a reflective process - the portfolio <em>for</em> learning) and the
+        <em>showcase</em> (a polished, public product - the portfolio <em>of</em> learning). Byblos
+        supports both: keep a page in <a href="{{{links.publishing}}}">draft</a> while it is a workspace,
+        then publish and <a href="{{{links.sharing}}}">share</a> it when it becomes a showcase.
+    </p>
+
+    <h2>Ownership, agency and identity</h2>
+    <p>
+        When students choose what to include and how to present it, the portfolio becomes
+        <em>theirs</em>., increasing their sense of <strong>ownership, agency and relevance</strong>. The
+        act of curating and narrating one's own learning is also an act of building a
+        scholarly and professional <strong>identity</strong>: a learner deciding "this is who I am
+        becoming, and here is the evidence." The <a href="{{{links.usecase_professional}}}">professional
+        showcase</a> leans hardest on this idea.
+    </p>
+
+    <h2>Why it counts as a high-impact practice</h2>
+    <p>
+        The AAC&amp;U introduced the idea of <strong>High-Impact Practices (HIPs)</strong> in 2007, teaching and learning approaches that reliably deepen learning and improve outcomes such as
+        retention and achievement, with especially strong benefits for students from underserved
+        backgrounds (Kuh, 2008). In 2016 the ePortfolio was added as the <strong>eleventh HIP</strong>
+        (Watson et al., 2016). Kuh and O'Donnell (2013) identify
+        <strong>eight elements</strong> that make any practice high-impact:
+    </p>
+    <ul class="byblos-docs-deflist">
+        <li>high performance expectations;</li>
+        <li>significant time and effort over an extended period;</li>
+        <li>substantive interaction with staff and peers;</li>
+        <li>experience of diversity and difference;</li>
+        <li>frequent, timely, constructive <strong>feedback</strong>;</li>
+        <li>periodic, structured <strong>reflection</strong> and integration of learning;</li>
+        <li>real-world application; and</li>
+        <li><strong>public demonstration</strong> of competence.</li>
+    </ul>
+    <p>
+        A well-run ePortfolio can embody almost all eight at once, which is why it is sometimes called a
+        "meta-HIP" that amplifies the others. Eynon and Gambino's (2017) study of effective practice
+        distils the design into three moves that recur throughout this documentation:
+        <strong>Inquiry, Reflection and Integration</strong>.
+    </p>
+
+    <h2>The theory underneath</h2>
+    <p>
+        These ideas rest on a long tradition. Experiential learning theory holds that we learn by acting
+        and then reflecting on the result (Kolb, 1984), building on Dewey's (1933) account of reflective
+        thought and Schön's (1983) "reflective practitioner" who reflects both in and on their action. A
+        portfolio operationalises that cycle: do the work, gather the evidence, reflect, and feed what you
+        notice back into what you do next. This is supported, in competency-based settings, by feedback at
+        milestones that turns reflection into formative assessment (Wolf et al., 2022).
+    </p>
+
+    <h2>How Byblos puts this into practice</h2>
+    <ul class="byblos-docs-deflist">
+        <li><strong>Collect &amp; curate</strong> - artefacts, pages and sections let students gather evidence from across courses and choose what best represents them.</li>
+        <li><strong>Reflect</strong> - text sections sit alongside evidence so every artefact can carry its "so what".</li>
+        <li><strong>Integrate</strong> - <a href="{{{links.collections}}}">collections</a> and a home page let a learner tell one coherent story across many pages.</li>
+        <li><strong>Feedback &amp; interaction</strong> - <a href="{{{links.sharing}}}">sharing</a> and peer review build in the substantive feedback that HIPs depend on.</li>
+        <li><strong>Public demonstration</strong> - publishing, course/cohort sharing and public links let students demonstrate competence to a real audience, from a teacher to an employer.</li>
+    </ul>
+
+    <h2>References</h2>
+    <p class="byblos-docs-refs-intro">The guidance in this documentation draws on the following sources.</p>
+    <ul class="byblos-docs-refs">
+        <li>Barrett, H.C. (2010) 'Balancing the two faces of ePortfolios', <em>Educação, Formação &amp; Tecnologias</em>, 3(1), pp. 6–14. Available at: <a href="https://eft.educom.pt/index.php/eft/article/view/70" target="_blank" rel="noopener">https://eft.educom.pt/index.php/eft/article/view/70</a> (Accessed: 6 June 2026).</li>
+        <li>Dewey, J. (1933) <em>How we think: a restatement of the relation of reflective thinking to the educative process</em>. Boston: D.C. Heath.</li>
+        <li>Eynon, B. and Gambino, L.M. (2017) <em>High-impact ePortfolio practice: a catalyst for student, faculty, and institutional learning</em>. Sterling, VA: Stylus. Available at: <a href="https://research.ebsco.com/plink/1bcde12b-309f-3212-9d7a-101a602ed5d9" target="_blank" rel="noopener">https://research.ebsco.com/plink/1bcde12b-309f-3212-9d7a-101a602ed5d9</a> (Accessed: 6 June 2026).</li>
+        <li>Kolb, D.A. (1984) <em>Experiential learning: experience as the source of learning and development</em>. Englewood Cliffs, NJ: Prentice-Hall.</li>
+        <li>Kuh, G.D. (2008) <em>High-impact educational practices: what they are, who has access to them, and why they matter</em>. Washington, DC: Association of American Colleges and Universities.</li>
+        <li>Kuh, G.D. and O'Donnell, K. (2013) <em>Ensuring quality and taking high-impact practices to scale</em>. Washington, DC: Association of American Colleges and Universities.</li>
+        <li>Ohio State University (no date a) <em>ePortfolios in the curriculum</em>. Teaching and Learning Resource Center. Available at: <a href="https://teaching.resources.osu.edu/teaching-topics/eportfolios-curriculum" target="_blank" rel="noopener">https://teaching.resources.osu.edu/teaching-topics/eportfolios-curriculum</a> (Accessed: 6 June 2026).</li>
+        <li>Ohio State University (no date b) <em>High-impact practices: enhancing the student experience</em>. Teaching and Learning Resource Center. Available at: <a href="https://teaching.resources.osu.edu/teaching-topics/high-impact-practices-enhancing" target="_blank" rel="noopener">https://teaching.resources.osu.edu/teaching-topics/high-impact-practices-enhancing</a> (Accessed: 6 June 2026).</li>
+        <li>Schön, D.A. (1983) <em>The reflective practitioner: how professionals think in action</em>. New York: Basic Books.</li>
+        <li>Smith, K. and Tillema, H. (2006) 'Portfolios for learning, assessment and professional development in higher education', <em>Assessment &amp; Evaluation in Higher Education</em>, 31(3). <a href="https://doi.org/10.1080/02602930500352816" target="_blank" rel="noopener">doi:10.1080/02602930500352816</a>.</li>
+        <li>Watson, C.E., Kuh, G.D., Rhodes, T., Penny Light, T. and Chen, H.L. (2016) 'ePortfolios, the eleventh high-impact practice', <em>International Journal of ePortfolio</em>, 6(2), pp. 65–69. Available at: <a href="https://www.aacu.org/ijep/archives/volume-6-number-2" target="_blank" rel="noopener">https://www.aacu.org/ijep/archives/volume-6-number-2</a> (Accessed: 6 June 2026).</li>
+        <li>Wolf, A., Carbonaro, S. and Wolf, R. (2022) 'Empowering metacognitive learning in a competency-based curriculum in health professions through comprehensive learner record', <em>Intersection: A Journal at the Intersection of Assessment and Learning</em>, 3(2). Available at: <a href="https://files.eric.ed.gov/fulltext/EJ1359487.pdf" target="_blank" rel="noopener">https://files.eric.ed.gov/fulltext/EJ1359487.pdf</a> (Accessed: 6 June 2026).</li>
+        <li>Yancey, K.B. (2009) 'Reflection and electronic portfolios: inventing the self and reinventing the university', in Cambridge, D., Cambridge, B. and Yancey, K.B. (eds) <em>Electronic portfolios 2.0</em>. Sterling, VA: Stylus. Available at: <a href="https://research.ebsco.com/plink/7e2a0dc9-1a54-38a2-b09b-a7bf5c0362da" target="_blank" rel="noopener">https://research.ebsco.com/plink/7e2a0dc9-1a54-38a2-b09b-a7bf5c0362da</a> (Accessed: 6 June 2026).</li>
+    </ul>
+</div>

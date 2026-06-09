@@ -1,0 +1,117 @@
+{{!
+    @template local_byblos/docs/building_pages
+
+    Guide: creating a page from a template and adding sections.
+
+    Context variables:
+    - links (object) Map of topic key => URL.
+    - dashurl (string) Portfolio dashboard URL.
+    - newpageurl (string) New-page wizard URL.
+
+    @package    local_byblos
+    @copyright  2026 South African Theological Seminary
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+        "dashurl": "#",
+        "newpageurl": "#",
+        "pix": {"templates": "#", "page_editor": "#"},
+        "links": {
+            "index": "#", "getting_started": "#", "building_pages": "#",
+            "publishing": "#", "collections": "#", "sharing": "#",
+            "assessment": "#", "pedagogy": "#", "best_practices": "#",
+            "usecase_programme": "#", "usecase_course": "#",
+            "usecase_professional": "#"
+        }
+    }
+}}
+<div class="byblos-docs-article">
+
+    <h1>{{#str}}docs_topic_building_pages, local_byblos{{/str}}</h1>
+    <p class="byblos-docs-lead">
+        A page is built from a <strong>template</strong> (a sensible starting layout) that you then
+        fill with <strong>sections</strong> (content blocks). This guide takes you from a blank
+        dashboard to a finished page.
+    </p>
+
+    <h2>Step 1: Start a new page</h2>
+    <ol class="byblos-docs-steps">
+        <li>On the dashboard, open the <strong>{{#str}}nav_pages, local_byblos{{/str}}</strong> tab.</li>
+        <li>Click <strong>{{#str}}newpage, local_byblos{{/str}}</strong>. The
+            <a href="{{{newpageurl}}}">template gallery</a> opens.</li>
+        <li>Give the page a title in the box at the top (you can change it later).</li>
+        <li>Pick a template that matches your purpose, then click
+            <strong>{{#str}}createpage, local_byblos{{/str}}</strong>.</li>
+    </ol>
+
+    <figure class="byblos-docs-figure">
+        <img src="{{pix.templates}}" class="byblos-docs-img" loading="lazy"
+             alt="The template gallery with the eight template cards and the page-title field above them.">
+
+        <figcaption>Figure 1: Choosing a starting template.</figcaption>
+    </figure>
+
+    <p>The eight templates are starting points only, every section can be changed, removed, or added to afterwards. Pick the closest fit:</p>
+    <ul class="byblos-docs-deflist">
+        <li><strong>Personal Portfolio</strong>, <strong>Professional Profile</strong>: about-me pages with skills and links (good for the <a href="{{{links.usecase_professional}}}">professional showcase</a>).</li>
+        <li><strong>Academic CV</strong>, <strong>Research Portfolio</strong>: formal, reference-friendly layouts.</li>
+        <li><strong>Project Showcase</strong>, <strong>Creative Work</strong>: image-led layouts for project and portfolio work.</li>
+        <li><strong>Learning Journey</strong>: a reflective, timeline-led layout (good for the <a href="{{{links.usecase_programme}}}">programme exit portfolio</a>).</li>
+        <li><strong>Simple Page</strong>: a near-blank canvas when you want to build from scratch.</li>
+    </ul>
+
+    <h2>Step 2: Edit the page</h2>
+    <p>After creating the page you land in the <strong>editor</strong>. Here you can:</p>
+    <ul class="byblos-docs-deflist">
+        <li><strong>Rename the page</strong>: click the page title to edit it in place.</li>
+        <li><strong>Add a section</strong>: click <strong>{{#str}}addsection, local_byblos{{/str}}</strong> and choose a type from the picker.</li>
+        <li><strong>Edit a section</strong>: hover a section and use its toolbar to edit, move, or delete it.</li>
+        <li><strong>Change the look</strong>: open the settings panel to switch the page <strong>theme</strong>.</li>
+        <li><strong>Preview</strong>: see exactly what a viewer will see.</li>
+    </ul>
+
+    <figure class="byblos-docs-figure">
+        <img src="{{pix.page_editor}}" class="byblos-docs-img" loading="lazy"
+             alt="The page editor with the editable title, placed sections, and the Add section button.">
+
+        <figcaption>Figure 2: The page editor with a section's hover toolbar.</figcaption>
+    </figure>
+
+    <h2>Step 3: Choose your sections</h2>
+    <p>Sections are grouped here by what they are for. Mix and match freely.</p>
+    <ul class="byblos-docs-deflist">
+        <li><strong>Layout &amp; story:</strong> Hero banner, Text, Text&nbsp;+&nbsp;Image, Pull quote, Divider, Call to action.</li>
+        <li><strong>Media:</strong> Image gallery, YouTube video, Files (a downloadable list).</li>
+        <li><strong>Evidence &amp; achievement:</strong> Badges and Course completions (pulled from Moodle), plus Artefacts you have collected.</li>
+        <li><strong>Academic:</strong> Skills (named proficiency levels), Stats (big-number cards), Chart (bar/line/pie/donut), Word cloud, Citations (a formatted reference list).</li>
+        <li><strong>Reflection &amp; growth:</strong> three widgets that put the <a href="{{{links.pedagogy}}}">pedagogy</a> into practice:
+            <ul class="byblos-docs-deflist">
+                <li><strong>Reflection</strong>: scaffolded reflective writing. Pick a framework (<em>What? So what? Now what?</em>, Gibbs' cycle, DEAL or Kolb) and the section seeds the prompts for you. You can type <em>and</em> record audio, video or a screen capture directly in the reflection, so a spoken reflection is as easy as a written one. This is where the learning is made visible.</li>
+                <li><strong>Outcome map</strong>: list your programme outcomes or a rubric's criteria and map your strongest evidence (artefacts or pages) to each, with a short note on how it meets the outcome. This is the "constructive alignment" that makes a portfolio legible to an assessor, ideal for the <a href="{{{links.usecase_programme}}}">programme exit portfolio</a>.</li>
+                <li><strong>Goals</strong>: surface the learning goals you manage on your dashboard, with their progress, so a page can show not just what you have done but what you are working towards.</li>
+            </ul>
+        </li>
+        <li><strong>Navigation:</strong> Page navigation, which links between the pages of a collection (see <a href="{{{links.collections}}}">Collections</a>).</li>
+        <li><strong>Advanced:</strong> Custom HTML, for staff who need to paste raw markup. It is sanitised on save for safety, and may be hidden for students depending on site settings.</li>
+    </ul>
+
+    <div class="byblos-docs-tip">
+        <strong>Two sections worth knowing.</strong> The <strong>Chart</strong> and <strong>Image gallery</strong>
+        editors are visual: charts show a live preview as you type and support multiple data series,
+        axis labels and units; the gallery shows a thumbnail grid you can drag to reorder. Always
+        label what a number measures: a bar labelled "Hours per week" tells a far better story than a
+        bare "40".
+    </div>
+
+    <div class="byblos-docs-note">
+        <strong>Skills are levels, not percentages.</strong> The Skills section uses five named levels, Novice, Beginner, Intermediate, Proficient, Expert, so a reader knows what "Proficient" means.
+        Enter each skill as <code>Name:level</code> using a number from 1 (Novice) to 5 (Expert).
+    </div>
+
+    <h2>Next</h2>
+    <p>
+        When the page looks right, you need to <a href="{{{links.publishing}}}">publish</a> it and
+        <a href="{{{links.sharing}}}">share</a> it before anyone else can see it.
+    </p>
+</div>

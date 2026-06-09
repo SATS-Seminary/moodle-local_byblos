@@ -178,6 +178,8 @@ $data = [
     'sesskey'        => sesskey(),
 ];
 
+$PAGE->requires->js_call_amd('local_byblos/confirm', 'init');
+
 echo $OUTPUT->header();
 echo $OUTPUT->render_from_template('local_byblos/collection_view', $data);
 echo $OUTPUT->footer();

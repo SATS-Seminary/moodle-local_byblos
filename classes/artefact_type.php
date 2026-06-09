@@ -117,6 +117,10 @@ abstract class artefact_type {
             artefact_types\text::class,
             artefact_types\file::class,
             artefact_types\image::class,
+            artefact_types\audio::class,
+            artefact_types\video::class,
+            artefact_types\link::class,
+            artefact_types\embed::class,
             artefact_types\course_completion::class,
             artefact_types\badge::class,
             artefact_types\blog_entry::class,
@@ -126,5 +130,17 @@ abstract class artefact_type {
             $instance = new $classname();
             self::register($instance);
         }
+    }
+
+    /**
+     * The artefact types a user can create by hand, in display order.
+     *
+     * Excludes the auto-imported types (badge, course_completion, blog_entry),
+     * which are created from Moodle data rather than authored in the form.
+     *
+     * @return string[]
+     */
+    public static function creatable_types(): array {
+        return ['text', 'image', 'file', 'link', 'audio', 'video', 'embed'];
     }
 }

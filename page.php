@@ -136,6 +136,28 @@ if ($isowner && !$preview) {
     }
 }
 
+// Page feedback (logged-in, owner-moderated). Never shown in preview/embedded mode.
+$feedbackmode = $pagerecord->feedback ?? 'off';
+$canleavefeedback = (!$isowner) && !$preview
+    && share::can_leave_feedback((int) $USER->id, (int) $pagerecord->id);
+$feedbackvisible = !$preview && ($feedbackmode !== 'off')
+    && ($isowner || share::can_view_page((int) $USER->id, (int) $pagerecord->id));
+$feedbackrows = [];
+if ($feedbackvisible) {
+    foreach (\local_byblos\feedback::list_for_page((int) $pagerecord->id, $isowner) as $row) {
+        $author = $DB->get_record('user', ['id' => $row->authorid]);
+        $feedbackrows[] = [
+            'id'            => (int) $row->id,
+            'authorname'    => $author ? fullname($author) : '',
+            'is_teacher'    => ($row->authorrole === 'teacher'),
+            'body'          => format_text($row->body, FORMAT_PLAIN),
+            'is_hidden'     => ((int) $row->visible === 0),
+            'iscurrentuser' => ((int) $row->authorid === (int) $USER->id),
+            'timecreated'   => userdate((int) $row->timecreated),
+        ];
+    }
+}
+
 $data = [
     'page'        => [
         'id'          => $pagerecord->id,
@@ -161,6 +183,16 @@ $data = [
     'publishurl'  => (new moodle_url('/local/byblos/publish.php'))->out(false),
     'dashurl'     => (new moodle_url('/local/byblos/view.php'))->out(false),
     'sesskey'     => sesskey(),
+    'feedback_enabled'       => ($feedbackmode !== 'off'),
+    'feedback_mode_off'      => ($feedbackmode === 'off'),
+    'feedback_mode_teachers' => ($feedbackmode === 'teachers'),
+    'feedback_mode_cohort'   => ($feedbackmode === 'cohort'),
+    'can_set_feedback_mode'  => ($isowner && !$preview),
+    'can_leave_feedback'     => $canleavefeedback,
+    'feedback_visible'       => $feedbackvisible,
+    'feedback'               => $feedbackrows,
+    'has_feedback'           => !empty($feedbackrows),
+    'show_feedback_panel'    => (($isowner && !$preview) || $feedbackvisible || $canleavefeedback),
 ];
 
 if ($canannounce) {
@@ -169,6 +201,15 @@ if ($canannounce) {
         'wwwroot' => $CFG->wwwroot,
     ]]);
 }
+
+if ((($isowner && !$preview) || $canleavefeedback)) {
+    $PAGE->requires->js_call_amd('local_byblos/feedback', 'init', [[
+        'pageid'   => (int) $pagerecord->id,
+        'isowner'  => ($isowner && !$preview),
+        'canleave' => $canleavefeedback,
+    ]]);
+}
+$PAGE->requires->js_call_amd('local_byblos/confirm', 'init');
 
 echo $OUTPUT->header();
 echo $OUTPUT->render_from_template('local_byblos/page_view', $data);

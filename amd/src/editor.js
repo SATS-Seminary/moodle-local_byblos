@@ -24,8 +24,10 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 define(['jquery', 'core/ajax', 'core/notification', 'core/str',
-        'local_byblos/editor_inline', 'local_byblos/upload', 'editor_tiny/loader'],
-function($, Ajax, Notification, Str, InlineEditor, Upload, TinyLoader) {
+        'local_byblos/editor_inline', 'local_byblos/upload', 'editor_tiny/loader',
+        'core/fragment', 'core/modal_save_cancel', 'core/modal_events'],
+function($, Ajax, Notification, Str, InlineEditor, Upload, TinyLoader,
+        Fragment, ModalSaveCancel, ModalEvents) {
     'use strict';
 
     /** @type {number} Page ID from PHP. */
@@ -720,6 +722,37 @@ function($, Ajax, Notification, Str, InlineEditor, Upload, TinyLoader) {
                     'rich'
                 );
                 break;
+            case 'alignment':
+                h = buildField('Heading', 'bse_heading', cfg.heading || 'Outcome map');
+                h += buildField('Intro (optional)', 'bse_align_intro', cfg.intro || '', 'textarea');
+                h += '<div class="bse-align-import d-none mb-2">' +
+                    '<label class="font-weight-bold" style="font-size:0.8rem !important;">' +
+                    'Import outcomes from a competency framework</label>' +
+                    '<div class="input-group input-group-sm">' +
+                    '<select id="bse_align_framework" class="custom-select custom-select-sm">' +
+                    '<option value="0">Choose a framework…</option></select>' +
+                    '<div class="input-group-append">' +
+                    '<button type="button" class="btn btn-outline-secondary bse-align-import-btn">Import</button>' +
+                    '</div></div></div>';
+                h += '<label class="font-weight-bold" style="font-size:0.8rem !important;">Outcomes</label>';
+                h += '<div id="bse_align_outcomes"></div>';
+                h += '<button type="button" class="btn btn-outline-secondary btn-sm mt-1 bse-align-add">' +
+                    '<i class="fa fa-plus"></i> Add outcome</button>';
+                break;
+            case 'goals':
+                h = buildField('Heading', 'bse_heading', cfg.heading || 'My goals');
+                h += '<div class="form-group"><label for="bse_goals_mode">Which goals</label>' +
+                    '<select id="bse_goals_mode" class="custom-select custom-select-sm">' +
+                    '<option value="all_active"' + ((cfg.mode || 'all_active') === 'all_active' ? ' selected' : '') +
+                    '>All my active goals</option>' +
+                    '<option value="selected"' + (cfg.mode === 'selected' ? ' selected' : '') +
+                    '>Only the goals I choose</option>' +
+                    '</select></div>';
+                h += '<div class="bse-goals-select-block' +
+                    (cfg.mode === 'selected' ? '' : ' d-none') + '">' +
+                    '<label class="font-weight-bold" style="font-size:0.8rem !important;">Choose goals</label>' +
+                    '<div id="bse_goals_list"><p class="text-muted small">Loading goals…</p></div></div>';
+                break;
             default:
                 h = '<p class="text-muted">No edit form for this section type.</p>';
         }
@@ -901,6 +934,22 @@ function($, Ajax, Notification, Str, InlineEditor, Upload, TinyLoader) {
                     start: parseInt(v('bse_yt_start'), 10) || 0,
                     alignment: v('bse_yt_align') || 'full',
                     body: v('bse_yt_body') || ''
+                };
+                break;
+            case 'alignment':
+                cfg = {
+                    heading: v('bse_heading'),
+                    intro: v('bse_align_intro'),
+                    source: 'freeform',
+                    frameworkid: 0,
+                    outcomes: collectAlignmentOutcomes($panel)
+                };
+                break;
+            case 'goals':
+                cfg = {
+                    heading: v('bse_heading'),
+                    mode: v('bse_goals_mode') || 'all_active',
+                    goalids: collectGoalIds($panel)
                 };
                 break;
         }
@@ -2094,6 +2143,14 @@ function($, Ajax, Notification, Str, InlineEditor, Upload, TinyLoader) {
         }
         var content = $card.attr('data-content') || '';
 
+        // The reflection section uses a Moodle-managed TinyMCE editor (with the
+        // satsrecorder plugin), which only works inside a server-rendered form.
+        // Load it through a fragment into a modal instead of the inline panel.
+        if (stype === 'reflection') {
+            openReflectionModal($card);
+            return;
+        }
+
         var html = buildEditForm(stype, cfg, content);
         html += '<div class="mt-2">' +
             '<button class="btn btn-primary btn-sm bse-save-section">' +
@@ -2169,6 +2226,12 @@ function($, Ajax, Notification, Str, InlineEditor, Upload, TinyLoader) {
         if (stype === 'pagenav') {
             initPagenavPanel($panel, cfg);
         }
+        if (stype === 'alignment') {
+            initAlignmentEditor($panel, cfg);
+        }
+        if (stype === 'goals') {
+            initGoalsEditor($panel, cfg);
+        }
 
         // Save handler.
         $panel.find('.bse-save-section').on('click', function() {
@@ -2201,6 +2264,268 @@ function($, Ajax, Notification, Str, InlineEditor, Upload, TinyLoader) {
             teardownRichFields();
             $panel.hide().empty();
         });
+    }
+
+    // ================================================================
+    // Reflection / Alignment / Goals editors
+    // ================================================================
+
+    /**
+     * Open the reflection editor in a modal. The body is a server-rendered
+     * moodleform whose `editor` element attaches TinyMCE + satsrecorder.
+     * @param {jQuery} $card
+     */
+    function openReflectionModal($card) {
+        var sectionId = parseInt($card.data('section-id'), 10);
+        var contextId = (window.M && window.M.cfg && window.M.cfg.contextid) || 1;
+        Str.get_strings([
+            {key: 'reflection_edit_title', component: 'local_byblos'},
+            {key: 'savechanges', component: 'core'}
+        ]).then(function(s) {
+            return ModalSaveCancel.create({
+                title: s[0],
+                body: Fragment.loadFragment('local_byblos', 'reflection_editor', contextId,
+                    {sectionid: sectionId}),
+                buttons: {save: s[1]},
+                large: true
+            });
+        }).then(function(modal) {
+            modal.getRoot().on(ModalEvents.save, function(e) {
+                e.preventDefault();
+                if (window.tinyMCE && window.tinyMCE.triggerSave) {
+                    window.tinyMCE.triggerSave();
+                }
+                var $r = modal.getRoot();
+                callExternal('local_byblos_save_reflection', {
+                    sectionid: sectionId,
+                    heading: $r.find('[name="heading"]').val() || '',
+                    framework: $r.find('[name="framework"]').val() || 'gibbs',
+                    intro: $r.find('[name="intro"]').val() || '',
+                    bodyhtml: $r.find('[name="bodyhtml_editor[text]"]').val() || '',
+                    draftitemid: parseInt($r.find('[name="bodyhtml_editor[itemid]"]').val(), 10) || 0
+                }).then(function(data) {
+                    if (data && data.rendered) {
+                        $card.find('.byblos-section-preview').html(data.rendered);
+                    }
+                    modal.destroy();
+                    return;
+                }).catch(Notification.exception);
+            });
+            modal.show();
+            return modal;
+        }).catch(Notification.exception);
+    }
+
+    /**
+     * Open a modal to pick an artefact or page as evidence.
+     * @param {Function} onPick Callback receiving {type, id, title}.
+     */
+    function pickEvidence(onPick) {
+        var requests = Ajax.call([
+            {methodname: 'local_byblos_list_artefacts', args: {}},
+            {methodname: 'local_byblos_list_user_pages', args: {excludepageid: 0}}
+        ]);
+        $.when(requests[0], requests[1]).then(function(artefacts, pages) {
+            var html = '<h6>Artefacts</h6><div class="list-group mb-2">';
+            (artefacts || []).forEach(function(a) {
+                html += '<button type="button" class="list-group-item list-group-item-action bse-pick" ' +
+                    'data-type="artefact" data-id="' + a.id + '" data-title="' + escHtml(a.title) + '">' +
+                    escHtml(a.title) + '</button>';
+            });
+            html += '</div><h6>Pages</h6><div class="list-group">';
+            (pages || []).forEach(function(p) {
+                html += '<button type="button" class="list-group-item list-group-item-action bse-pick" ' +
+                    'data-type="page" data-id="' + p.id + '" data-title="' + escHtml(p.title) + '">' +
+                    escHtml(p.title) + '</button>';
+            });
+            html += '</div>';
+            return ModalSaveCancel.create({title: 'Add evidence', body: html});
+        }).then(function(modal) {
+            modal.getRoot().on('click', '.bse-pick', function() {
+                onPick({
+                    type: $(this).data('type'),
+                    id: parseInt($(this).data('id'), 10),
+                    title: '' + $(this).data('title')
+                });
+                modal.destroy();
+            });
+            modal.show();
+            return modal;
+        }).catch(Notification.exception);
+    }
+
+    /**
+     * Build an evidence chip element.
+     * @param {Object} ev {type, id, title}
+     * @returns {jQuery}
+     */
+    function alignmentChip(ev) {
+        return $('<span class="bse-align-chip badge badge-light border mr-1" ' +
+            'data-type="' + escHtml(ev.type) + '" data-id="' + (ev.id || 0) + '">' +
+            escHtml(ev.title || '') +
+            ' <a href="#" class="bse-align-chip-remove text-danger">&times;</a></span>');
+    }
+
+    /**
+     * Append an outcome row to the alignment editor.
+     * @param {jQuery} $container
+     * @param {Object} outcome
+     */
+    function addAlignmentOutcomeRow($container, outcome) {
+        var $row = $('<div class="bse-align-outcome card card-body p-2 mb-2"></div>');
+        $row.append('<div class="input-group input-group-sm mb-1">' +
+            '<input type="text" class="form-control bse-align-text" placeholder="Outcome / criterion" value="' +
+            escHtml(outcome.text || '') + '">' +
+            '<div class="input-group-append">' +
+            '<button type="button" class="btn btn-outline-danger bse-align-remove">' +
+            '<i class="fa fa-trash"></i></button></div></div>');
+        var $chips = $('<div class="bse-align-chips d-flex flex-wrap mb-1"></div>');
+        (outcome.evidence || []).forEach(function(ev) {
+            $chips.append(alignmentChip(ev));
+        });
+        $row.append($chips);
+        $row.append('<input type="text" class="form-control form-control-sm bse-align-note mb-1" ' +
+            'placeholder="How this evidence meets the outcome (optional)" value="' +
+            escHtml(outcome.note || '') + '">');
+        $row.append('<button type="button" class="btn btn-outline-secondary btn-sm bse-align-addevidence">' +
+            '<i class="fa fa-link"></i> Add evidence</button>');
+        $container.append($row);
+
+        $row.find('.bse-align-remove').on('click', function() {
+            $row.remove();
+        });
+        $row.find('.bse-align-addevidence').on('click', function() {
+            pickEvidence(function(ev) {
+                $chips.append(alignmentChip(ev));
+            });
+        });
+        $chips.on('click', '.bse-align-chip-remove', function(ev) {
+            ev.preventDefault();
+            $(this).closest('.bse-align-chip').remove();
+        });
+    }
+
+    /**
+     * Initialise the alignment (outcome map) editor.
+     * @param {jQuery} $panel
+     * @param {Object} cfg
+     */
+    function initAlignmentEditor($panel, cfg) {
+        var $outcomes = $panel.find('#bse_align_outcomes');
+        (cfg.outcomes || []).forEach(function(o) {
+            addAlignmentOutcomeRow($outcomes, o);
+        });
+        if (!$outcomes.children().length) {
+            addAlignmentOutcomeRow($outcomes, {});
+        }
+        $panel.find('.bse-align-add').on('click', function() {
+            addAlignmentOutcomeRow($outcomes, {});
+        });
+
+        // Optionally surface a competency-framework import (only when enabled).
+        callExternal('local_byblos_list_competency_frameworks', {}).then(function(frameworks) {
+            if (!frameworks || !frameworks.length) {
+                return frameworks;
+            }
+            var $sel = $panel.find('#bse_align_framework');
+            frameworks.forEach(function(fw) {
+                $sel.append($('<option>').val(fw.id).text(fw.shortname));
+            });
+            $panel.find('.bse-align-import').removeClass('d-none');
+            return frameworks;
+        }).catch(function() {
+            return null;
+        });
+
+        $panel.find('.bse-align-import-btn').on('click', function() {
+            var fwid = parseInt($panel.find('#bse_align_framework').val(), 10) || 0;
+            if (!fwid) {
+                return;
+            }
+            callExternal('local_byblos_list_framework_competencies', {frameworkid: fwid})
+                .then(function(comps) {
+                    (comps || []).forEach(function(c) {
+                        addAlignmentOutcomeRow($outcomes, {text: c.label, evidence: [], note: ''});
+                    });
+                    return comps;
+                }).catch(Notification.exception);
+        });
+    }
+
+    /**
+     * Collect outcomes from the alignment editor.
+     * @param {jQuery} $panel
+     * @returns {Array}
+     */
+    function collectAlignmentOutcomes($panel) {
+        var outcomes = [];
+        $panel.find('.bse-align-outcome').each(function() {
+            var $row = $(this);
+            var text = ($row.find('.bse-align-text').val() || '').trim();
+            if (!text) {
+                return;
+            }
+            var evidence = [];
+            $row.find('.bse-align-chip').each(function() {
+                evidence.push({
+                    type: '' + $(this).data('type'),
+                    id: parseInt($(this).data('id'), 10) || 0,
+                    title: $(this).clone().children().remove().end().text().trim()
+                });
+            });
+            outcomes.push({
+                text: text,
+                evidence: evidence,
+                note: ($row.find('.bse-align-note').val() || '').trim()
+            });
+        });
+        return outcomes;
+    }
+
+    /**
+     * Initialise the goals-section editor (heading + mode + goal multiselect).
+     * @param {jQuery} $panel
+     * @param {Object} cfg
+     */
+    function initGoalsEditor($panel, cfg) {
+        var selected = {};
+        (cfg.goalids || []).forEach(function(id) {
+            selected[parseInt(id, 10)] = true;
+        });
+        $panel.find('#bse_goals_mode').on('change', function() {
+            $panel.find('.bse-goals-select-block').toggleClass('d-none', $(this).val() !== 'selected');
+        });
+        // userid 0 => the current user (the page owner editing their own page).
+        callExternal('local_byblos_list_goals', {userid: 0}).then(function(goals) {
+            var $list = $panel.find('#bse_goals_list');
+            $list.empty();
+            if (!goals || !goals.length) {
+                $list.append('<p class="text-muted small">You have no goals yet. Create them on your dashboard.</p>');
+                return goals;
+            }
+            goals.forEach(function(g) {
+                var checked = selected[g.id] ? ' checked' : '';
+                $list.append('<div class="form-check">' +
+                    '<input type="checkbox" class="form-check-input bse-goal-check" value="' + g.id + '"' +
+                    checked + ' id="bse_goal_' + g.id + '">' +
+                    '<label class="form-check-label small" for="bse_goal_' + g.id + '">' +
+                    escHtml(g.title) + '</label></div>');
+            });
+            return goals;
+        }).catch(Notification.exception);
+    }
+
+    /**
+     * Collect the selected goal ids from the goals editor.
+     * @param {jQuery} $panel
+     * @returns {Array}
+     */
+    function collectGoalIds($panel) {
+        var ids = [];
+        $panel.find('.bse-goal-check:checked').each(function() {
+            ids.push(parseInt($(this).val(), 10));
+        });
+        return ids;
     }
 
     // ================================================================

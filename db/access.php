@@ -113,4 +113,29 @@ $capabilities = [
         ],
         'riskbitmask' => RISK_XSS,
     ],
+
+    // Create and manage one's own learning goals (self-regulated-learning loop).
+    'local/byblos:managegoals' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => [
+            'student' => CAP_ALLOW,
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
+        ],
+    ],
+
+    // Leave feedback on another user's shared page (when the owner has enabled
+    // feedback for that page). Logged-in users only; scope is gated per page.
+    'local/byblos:leavefeedback' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => [
+            'student' => CAP_ALLOW,
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
+        ],
+    ],
 ];

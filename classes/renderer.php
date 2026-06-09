@@ -169,6 +169,13 @@ class renderer {
             'files' => self::render_files_section($config),
             'youtube' => self::render_youtube_section($config),
             'pagenav' => self::render_pagenav_section($config, $hostpageid),
+            'reflection' => section_helpers::render_reflection(
+                $config,
+                (int) $section->id,
+                \context_user::instance($userid)->id
+            ),
+            'alignment' => section_helpers::render_alignment($config, $userid),
+            'goals' => section_helpers::render_goals($config, $userid),
             default => \html_writer::div(
                 get_string('unknownsectiontype', 'local_byblos', s($section->sectiontype)),
                 'alert alert-warning'
@@ -253,7 +260,7 @@ class renderer {
             $html .= \html_writer::tag('h2', s($heading), ['class' => 'byblos-text-heading']);
         }
         if ($body !== '') {
-            $html .= \html_writer::div($body, 'byblos-text-body');
+            $html .= \html_writer::div(section_helpers::clean_body($body), 'byblos-text-body');
         } else {
             $html .= \html_writer::tag(
                 'p',
@@ -287,7 +294,7 @@ class renderer {
             $textcontent .= \html_writer::tag('h3', s($heading));
         }
         if ($body !== '') {
-            $textcontent .= \html_writer::div($body);
+            $textcontent .= \html_writer::div(section_helpers::clean_body($body));
         }
 
         $textorder = $reversed ? 'order-2' : 'order-1';

@@ -786,7 +786,7 @@ class section_helpers {
         if ($body !== '') {
             $html .= '<div class="byblos-quote-body" style="font-size:1.25rem !important;'
                 . ' line-height:1.55 !important; color:#333 !important; margin-bottom:1rem !important;">'
-                . $body . '</div>';
+                . self::clean_body($body) . '</div>';
         } else {
             $html .= '<div class="byblos-quote-body text-muted"><em>'
                 . get_string('emptyquote', 'local_byblos') . '</em></div>';
@@ -794,8 +794,9 @@ class section_helpers {
 
         if ($attribution !== '') {
             $attrhtml = s($attribution);
-            if ($source !== '') {
-                $attrhtml = '<a href="' . s($source) . '" target="_blank" rel="noopener"'
+            $cleansource = clean_param($source, PARAM_URL);
+            if ($cleansource !== '') {
+                $attrhtml = '<a href="' . s($cleansource) . '" target="_blank" rel="noopener"'
                     . ' style="color:inherit !important; text-decoration:underline !important;">'
                     . $attrhtml . '</a>';
             }
@@ -924,8 +925,9 @@ class section_helpers {
                 continue;
             }
             $body = s($text);
-            if ($url !== '') {
-                $body = '<a href="' . s($url) . '" target="_blank" rel="noopener"'
+            $cleanurl = clean_param($url, PARAM_URL);
+            if ($cleanurl !== '') {
+                $body = '<a href="' . s($cleanurl) . '" target="_blank" rel="noopener"'
                     . ' style="color:inherit !important; text-decoration:underline !important;">'
                     . $body . '</a>';
             }
@@ -1340,7 +1342,8 @@ class section_helpers {
             : '';
 
         $bodyhtml = $body !== ''
-            ? '<div class="byblos-youtube-body" style="min-width:0 !important;">' . $body . '</div>'
+            ? '<div class="byblos-youtube-body" style="min-width:0 !important;">'
+                . self::clean_body($body) . '</div>'
             : '';
 
         // Per-alignment layout.
@@ -1596,5 +1599,227 @@ class section_helpers {
 
         $html .= '</div>';
         return $html;
+    }
+
+    /**
+     * Render a learning-goals block: the page owner's goals with progress bars.
+     *
+     * @param array $config  Decoded configdata: `heading`, `mode`, `goalids`.
+     * @param int   $ownerid The page owner whose goals to surface.
+     * @return string HTML fragment.
+     */
+    public static function render_goals(array $config, int $ownerid): string {
+        $heading = (string) ($config['heading'] ?? '');
+        $mode    = (string) ($config['mode'] ?? 'all_active');
+        $goalids = is_array($config['goalids'] ?? null) ? array_map('intval', $config['goalids']) : [];
+
+        $goals = goal::list_by_user($ownerid);
+        if ($mode === 'selected') {
+            $set = array_flip($goalids);
+            $goals = array_values(array_filter($goals, fn($g) => isset($set[(int) $g->id])));
+        } else {
+            $goals = array_values(array_filter($goals, fn($g) => $g->status === 'active'));
+        }
+
+        $html = '<div class="byblos-section-goals" style="padding:1.5rem 0 !important;">';
+        if ($heading !== '') {
+            $html .= '<h2 class="byblos-goals-heading" style="margin-bottom:1rem !important;">'
+                . s($heading) . '</h2>';
+        }
+
+        if (empty($goals)) {
+            $html .= '<p class="text-muted"><em>' . get_string('nogoals', 'local_byblos') . '</em></p>';
+            $html .= '</div>';
+            return $html;
+        }
+
+        foreach ($goals as $g) {
+            $progress = max(0, min(100, (int) $g->progress));
+            $statuslabel = get_string('goalstatus_' . $g->status, 'local_byblos');
+            $html .= '<div class="byblos-goal-row" style="margin-bottom:1rem !important;">';
+            $html .= '<div style="display:flex !important; justify-content:space-between !important;'
+                . ' align-items:baseline !important;">';
+            $html .= '<strong style="font-size:1rem !important;">' . s($g->title) . '</strong>';
+            $html .= '<span style="font-size:0.8rem !important; color:#666 !important;">'
+                . s($statuslabel) . ' · ' . $progress . '%</span>';
+            $html .= '</div>';
+            $html .= '<div style="background:#e9ecef !important; border-radius:0.4rem !important;'
+                . ' height:0.6rem !important; overflow:hidden !important; margin-top:0.25rem !important;">';
+            $html .= '<div style="width:' . $progress . '% !important; height:100% !important;'
+                . ' background:#0d6efd !important;"></div>';
+            $html .= '</div>';
+            if (!empty($g->description)) {
+                $html .= '<div style="font-size:0.85rem !important; color:#666 !important;'
+                    . ' margin-top:0.25rem !important;">' . s($g->description) . '</div>';
+            }
+            $html .= '</div>';
+        }
+
+        $html .= '</div>';
+        return $html;
+    }
+
+    /**
+     * Render an outcome-alignment map: each outcome with the evidence mapped to it.
+     *
+     * @param array $config  Decoded configdata: `heading`, `intro`, `outcomes[]`.
+     * @param int   $ownerid The page owner (reserved for future live resolution).
+     * @return string HTML fragment.
+     */
+    public static function render_alignment(array $config, int $ownerid): string {
+        $heading  = (string) ($config['heading'] ?? '');
+        $intro    = (string) ($config['intro'] ?? '');
+        $outcomes = is_array($config['outcomes'] ?? null) ? $config['outcomes'] : [];
+
+        $html = '<div class="byblos-section-alignment" style="padding:1.5rem 0 !important;">';
+        if ($heading !== '') {
+            $html .= '<h2 class="byblos-alignment-heading" style="margin-bottom:0.5rem !important;">'
+                . s($heading) . '</h2>';
+        }
+        if ($intro !== '') {
+            $html .= '<p style="color:#555 !important; margin-bottom:1rem !important;">' . s($intro) . '</p>';
+        }
+
+        if (empty($outcomes)) {
+            $html .= '<p class="text-muted"><em>' . get_string('noalignment', 'local_byblos') . '</em></p>';
+            $html .= '</div>';
+            return $html;
+        }
+
+        foreach ($outcomes as $outcome) {
+            $text     = (string) ($outcome['text'] ?? '');
+            $note     = (string) ($outcome['note'] ?? '');
+            $evidence = is_array($outcome['evidence'] ?? null) ? $outcome['evidence'] : [];
+            if ($text === '') {
+                continue;
+            }
+
+            $html .= '<div class="byblos-alignment-row" style="border:1px solid rgba(0,0,0,0.08) !important;'
+                . ' border-radius:0.5rem !important; padding:1rem !important; margin-bottom:0.75rem !important;'
+                . ' background:#fff !important;">';
+            $html .= '<div class="byblos-alignment-outcome" style="font-weight:600 !important;'
+                . ' margin-bottom:0.5rem !important;">' . s($text) . '</div>';
+
+            if (!empty($evidence)) {
+                $html .= '<div class="byblos-alignment-evidence" style="display:flex !important;'
+                    . ' flex-wrap:wrap !important; gap:0.4rem !important; margin-bottom:0.4rem !important;">';
+                foreach ($evidence as $ev) {
+                    $type  = (string) ($ev['type'] ?? '');
+                    $evid  = (int) ($ev['id'] ?? 0);
+                    $title = (string) ($ev['title'] ?? '');
+                    if ($title === '' || $evid <= 0 || !in_array($type, ['artefact', 'page'], true)) {
+                        continue;
+                    }
+                    $url = (new \moodle_url('/local/byblos/' . $type . '.php', ['id' => $evid]))->out(false);
+                    $icon = $type === 'artefact' ? 'fa-puzzle-piece' : 'fa-file-text-o';
+                    $html .= '<a href="' . $url . '" class="byblos-alignment-chip" '
+                        . 'style="display:inline-flex !important; align-items:center !important;'
+                        . ' gap:0.3rem !important; padding:0.2rem 0.6rem !important;'
+                        . ' background:#eef2ff !important; border-radius:1rem !important;'
+                        . ' font-size:0.85rem !important; text-decoration:none !important;'
+                        . ' color:#1c3d8f !important;"><i class="fa ' . $icon . '"></i>'
+                        . s($title) . '</a>';
+                }
+                $html .= '</div>';
+            }
+
+            if ($note !== '') {
+                $html .= '<div class="byblos-alignment-note" style="font-size:0.85rem !important;'
+                    . ' color:#666 !important; font-style:italic !important;">' . s($note) . '</div>';
+            }
+            $html .= '</div>';
+        }
+
+        $html .= '</div>';
+        return $html;
+    }
+
+    /**
+     * Render a reflection section: scaffolded rich body with recorded media.
+     *
+     * The stored body holds @@PLUGINFILE@@ tokens that we rewrite to live URLs
+     * before passing through format_text (the same sanitiser as the custom-HTML
+     * section; HTMLPurifier permits audio/video/source).
+     *
+     * @param array $config        Decoded configdata: `heading`, `framework`, `intro`, `bodyhtml`.
+     * @param int   $sectionid     The section id (file area itemid).
+     * @param int   $usercontextid The page owner's user context id (file storage context).
+     * @return string HTML fragment.
+     */
+    public static function render_reflection(array $config, int $sectionid, int $usercontextid): string {
+        $heading   = (string) ($config['heading'] ?? '');
+        $framework = (string) ($config['framework'] ?? 'freewrite');
+        $intro     = (string) ($config['intro'] ?? '');
+        $bodyhtml  = (string) ($config['bodyhtml'] ?? '');
+
+        $valid = ['freewrite', 'wsnw', 'gibbs', 'deal', 'kolb'];
+        if (!in_array($framework, $valid, true)) {
+            $framework = 'freewrite';
+        }
+
+        $html = '<div class="byblos-section-reflection byblos-reflection-framework-' . s($framework)
+            . '" style="padding:1.5rem 0 !important;">';
+        if ($heading !== '') {
+            $html .= '<h2 class="byblos-reflection-heading" style="margin-bottom:0.5rem !important;">'
+                . s($heading) . '</h2>';
+        }
+        if ($intro !== '') {
+            $html .= '<p class="byblos-reflection-intro" style="color:#555 !important;'
+                . ' margin-bottom:1rem !important;">' . s($intro) . '</p>';
+        }
+
+        if (
+            trim(strip_tags($bodyhtml)) === '' && stripos($bodyhtml, '<audio') === false
+                && stripos($bodyhtml, '<video') === false
+        ) {
+            $html .= '<p class="text-muted"><em>' . get_string('noreflection', 'local_byblos') . '</em></p>';
+            $html .= '</div>';
+            return $html;
+        }
+
+        global $CFG;
+        require_once($CFG->libdir . '/filelib.php');
+
+        $bodyhtml = file_rewrite_pluginfile_urls(
+            $bodyhtml,
+            'pluginfile.php',
+            $usercontextid,
+            'local_byblos',
+            file_manager::FILEAREA_REFLECTION,
+            $sectionid
+        );
+        $clean = format_text($bodyhtml, FORMAT_HTML, [
+            'noclean'     => false,
+            'context'     => \context_system::instance(),
+            'allowid'     => false,
+            'overflowdiv' => false,
+        ]);
+
+        $html .= '<div class="byblos-reflection-body">' . $clean . '</div>';
+        $html .= '</div>';
+        return $html;
+    }
+
+    /**
+     * Sanitise a stored rich-text body before output.
+     *
+     * Section bodies are stored as raw HTML (PARAM_RAW configdata) and must be
+     * passed through HTMLPurifier on the way out, exactly like the custom-HTML
+     * and reflection sections, so that scripts, event handlers and javascript:
+     * URLs cannot survive into a shared or public page (stored-XSS defence).
+     *
+     * @param string $body Raw stored HTML.
+     * @return string Sanitised HTML (empty string for empty input).
+     */
+    public static function clean_body(string $body): string {
+        if (trim($body) === '') {
+            return '';
+        }
+        return format_text($body, FORMAT_HTML, [
+            'noclean'     => false,
+            'context'     => \context_system::instance(),
+            'allowid'     => false,
+            'overflowdiv' => false,
+        ]);
     }
 }

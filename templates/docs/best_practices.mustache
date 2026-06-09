@@ -1,0 +1,120 @@
+{{!
+    @template local_byblos/docs/best_practices
+
+    Concept page: high-level best practices for building a good ePortfolio,
+    grounded in the scholarship summarised on the pedagogy page.
+
+    Context variables:
+    - links (object) Map of topic key => URL.
+    - dashurl (string) Portfolio dashboard URL.
+    - newpageurl (string) New-page wizard URL.
+
+    @package    local_byblos
+    @copyright  2026 South African Theological Seminary
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+        "dashurl": "#",
+        "newpageurl": "#",
+        "links": {
+            "index": "#", "getting_started": "#", "building_pages": "#",
+            "publishing": "#", "collections": "#", "sharing": "#",
+            "assessment": "#", "pedagogy": "#", "best_practices": "#",
+            "usecase_programme": "#", "usecase_course": "#",
+            "usecase_professional": "#"
+        }
+    }
+}}
+<div class="byblos-docs-article">
+
+    <h1>{{#str}}docs_topic_best_practices, local_byblos{{/str}}</h1>
+    <p class="byblos-docs-lead">
+        A strong portfolio is curated, reflective and coherent, not just a complete archive of everything
+        you have done. These ten high-level practices come straight from the
+        <a href="{{{links.pedagogy}}}">pedagogy</a> behind ePortfolios; each one notes how to apply it in Byblos.
+    </p>
+
+    <ol class="byblos-docs-steps byblos-docs-bp">
+        <li>
+            <strong>Start with purpose and audience.</strong>
+            Decide first whether this portfolio is for <em>learning</em> (a reflective workspace), for
+            <em>assessment</em> (graded against criteria), or a <em>showcase</em> (for an employer), the three pull in different directions, and being clear up front keeps the portfolio focused
+            (Smith and Tillema, 2006; Barrett, 2010). Then design for the person who will read it.
+        </li>
+        <li>
+            <strong>Curate; don't accumulate.</strong>
+            Choose your strongest, most representative evidence rather than uploading everything. A few
+            well-chosen "signature" artefacts say more than a full archive. In Byblos, keep working
+            material as <a href="{{{links.building_pages}}}">artefacts</a> and surface only the best on
+            your pages.
+        </li>
+        <li>
+            <strong>Make reflection the engine.</strong>
+            Reflection is where the learning happens, so caption every artefact. A simple, well-known
+            prompt is <strong>"What? So what? Now what?"</strong>: what is this, what did I learn from it,
+            and what will I do next. Add a Text section beside each piece of evidence to answer it
+            (Yancey, 2009).
+        </li>
+        <li>
+            <strong>Show growth, not just polish.</strong>
+            Evidence of <em>change over time</em>, a rough first attempt next to a later one, often
+            demonstrates more learning than a single finished product. Use a Timeline section or a
+            sequence of pages to make progress visible.
+        </li>
+        <li>
+            <strong>Integrate, tell one story.</strong>
+            Connect the dots across courses and experiences instead of presenting disconnected items.
+            Gather related pages into a <a href="{{{links.collections}}}">collection</a> and use a home
+            page to frame the throughline that ties everything together.
+        </li>
+        <li>
+            <strong>Align evidence to outcomes.</strong>
+            If you are working towards programme outcomes, course criteria or a rubric, map your evidence
+            to them explicitly so a reader can see the match. This "constructive alignment" is what makes a
+            portfolio legible to an assessor (Wolf et al., 2022).
+        </li>
+        <li>
+            <strong>Seek feedback and revise.</strong>
+            Portfolios improve through dialogue. <a href="{{{links.sharing}}}">Share</a> a draft with a
+            peer or teacher, or use peer review where a course offers it, and treat the portfolio as
+            something you iterate, frequent, constructive feedback is one of the conditions that makes the
+            practice high-impact (Kuh and O'Donnell, 2013).
+        </li>
+        <li>
+            <strong>Design for your reader.</strong>
+            Keep navigation clear and the look consistent, write concise headings, and make it accessible, meaningful alt text on images, real headings, sufficient contrast. A reader should be able to
+            find the substance in seconds.
+        </li>
+        <li>
+            <strong>Demonstrate to a real audience.</strong>
+            Public demonstration deepens the work. Match your audience to the right
+            <a href="{{{links.sharing}}}">share</a>: an individual teacher, a whole course or cohort, or, for people outside Moodle such as an employer, a public link.
+        </li>
+        <li>
+            <strong>Mind privacy and integrity.</strong>
+            Share deliberately and treat a public link like a password, anyone who has it can view the
+            page, and you can revoke it at any time. Present honest, authentic work that is your own, and
+            be careful with evidence that names or shows other people.
+        </li>
+        <li>
+            <strong>Keep it living.</strong>
+            A portfolio is never really "finished", revisit it, retire stale items, and add new evidence
+            as you grow. Because a published page keeps the same address, you can keep improving it and any
+            link you have shared always shows the latest version.
+        </li>
+    </ol>
+
+    <div class="byblos-docs-tip">
+        <strong>A quick test before you share.</strong> Read your portfolio as the intended reader would.
+        Can they tell, within a minute, who you are, what you can do, and what you have learned, and does
+        every artefact earn its place with a reflection that explains why it is there? If not, curate and
+        caption before you publish.
+    </div>
+
+    <div class="byblos-docs-note">
+        <strong>Where these come from.</strong> Each practice is grounded in published research on
+        ePortfolio pedagogy and high-impact practice. See <a href="{{{links.pedagogy}}}">Why ePortfolios
+        work</a> for the concepts and the full reference list.
+    </div>
+</div>

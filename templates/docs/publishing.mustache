@@ -1,0 +1,81 @@
+{{!
+    @template local_byblos/docs/publishing
+
+    Guide: the draft -> published workflow.
+
+    Context variables:
+    - links (object) Map of topic key => URL.
+    - dashurl (string) Portfolio dashboard URL.
+    - newpageurl (string) New-page wizard URL.
+
+    @package    local_byblos
+    @copyright  2026 South African Theological Seminary
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+        "dashurl": "#",
+        "newpageurl": "#",
+        "pix": {"publish_draft": "#"},
+        "links": {
+            "index": "#", "getting_started": "#", "building_pages": "#",
+            "publishing": "#", "collections": "#", "sharing": "#",
+            "assessment": "#", "usecase_programme": "#", "usecase_course": "#",
+            "usecase_professional": "#"
+        }
+    }
+}}
+<div class="byblos-docs-article">
+
+    <h1>{{#str}}docs_topic_publishing, local_byblos{{/str}}</h1>
+    <p class="byblos-docs-lead">
+        Every page is either a <strong>draft</strong> or <strong>published</strong>. Drafts are private to
+        you while you work; publishing makes a page visible to the people you have shared it with.
+        Publishing and sharing are two separate steps, you need both.
+    </p>
+
+    <h2>Draft vs published</h2>
+    <ul class="byblos-docs-deflist">
+        <li><strong>Draft</strong>: only you can see it, no matter who you have shared it with. New pages always start as drafts.</li>
+        <li><strong>Published</strong>: visible to anyone you have shared the page (or its collection) with, and to anyone holding a public link.</li>
+    </ul>
+
+    <div class="byblos-docs-note">
+        <strong>Sharing alone is not enough.</strong> If you share a draft, your viewers still see nothing
+        until you publish. Likewise, publishing without <a href="{{{links.sharing}}}">sharing</a> means
+        nobody has been granted access yet. Do both.
+    </div>
+
+    <h2>Publishing a page</h2>
+    <ol class="byblos-docs-steps">
+        <li>Open the page (from the dashboard, click the page card, or use Preview from the editor).</li>
+        <li>In the action bar, click <strong>{{#str}}publishpage, local_byblos{{/str}}</strong>.</li>
+        <li>Confirm when prompted, <em>"{{#str}}confirmpublishpage, local_byblos{{/str}}"</em></li>
+        <li>The status changes to published and the page becomes visible to your viewers.</li>
+    </ol>
+
+    <figure class="byblos-docs-figure">
+        <img src="{{pix.publish_draft}}" class="byblos-docs-img" loading="lazy"
+             alt="The page action bar showing the draft status badge and the green Publish button.">
+
+        <figcaption>Figure 1: Publishing a draft page.</figcaption>
+    </figure>
+
+    <h2>Reverting to draft</h2>
+    <p>Need to take a page back offline, to fix something, or after an assessment window closes?</p>
+    <ol class="byblos-docs-steps">
+        <li>Open the published page.</li>
+        <li>Click <strong>{{#str}}reverttodraft, local_byblos{{/str}}</strong>.</li>
+        <li>Confirm, <em>"{{#str}}confirmreverttodraft, local_byblos{{/str}}"</em></li>
+        <li>The page is hidden from viewers again until you re-publish.</li>
+    </ol>
+
+    <div class="byblos-docs-tip">
+        <strong>Check before you publish.</strong> Use <strong>Preview</strong> from the editor or the page
+        action bar to see your page exactly as a viewer will. Byblos also offers a
+        "preview as viewer" mode so you can confirm what a shared person, not you, the owner, will actually see.
+    </div>
+
+    <h2>Next</h2>
+    <p>With the page published, decide who can see it in <a href="{{{links.sharing}}}">Sharing</a>.</p>
+</div>

@@ -42,7 +42,26 @@ Example context (json):
         "exporturl": "#",
         "deleteurl": "#",
         "has_sections": false,
-        "rendered_content": "example"
+        "rendered_content": "example",
+        "show_feedback_panel": false,
+        "can_set_feedback_mode": false,
+        "feedback_mode_off": true,
+        "feedback_mode_teachers": false,
+        "feedback_mode_cohort": false,
+        "feedback_visible": false,
+        "can_leave_feedback": false,
+        "has_feedback": false,
+        "feedback": [
+            {
+                "id": 1,
+                "authorname": "example",
+                "is_teacher": false,
+                "body": "example",
+                "is_hidden": false,
+                "iscurrentuser": false,
+                "timecreated": "example"
+            }
+        ]
     }
 }}
 <div class="byblos-page-view" data-theme="{{page.themekey}}">
@@ -88,7 +107,7 @@ Example context (json):
             </a>
             {{#page.is_draft}}
             <form method="post" action="{{{publishurl}}}" class="d-inline"
-                  onsubmit="return confirm('{{#str}}confirmpublishpage, local_byblos{{/str}}');">
+                  data-byblos-confirm="{{#str}}confirmpublishpage, local_byblos{{/str}}">
                 <input type="hidden" name="sesskey" value="{{sesskey}}">
                 <input type="hidden" name="id" value="{{page.id}}">
                 <input type="hidden" name="action" value="publish">
@@ -100,7 +119,7 @@ Example context (json):
             {{/page.is_draft}}
             {{^page.is_draft}}
             <form method="post" action="{{{publishurl}}}" class="d-inline"
-                  onsubmit="return confirm('{{#str}}confirmreverttodraft, local_byblos{{/str}}');">
+                  data-byblos-confirm="{{#str}}confirmreverttodraft, local_byblos{{/str}}">
                 <input type="hidden" name="sesskey" value="{{sesskey}}">
                 <input type="hidden" name="id" value="{{page.id}}">
                 <input type="hidden" name="action" value="draft">
@@ -122,7 +141,7 @@ Example context (json):
                 <i class="fa fa-download"></i> {{#str}}exportthispage, local_byblos{{/str}}
             </a>
             <form method="post" action="{{{deleteurl}}}" class="d-inline"
-                  onsubmit="return confirm('{{#str}}confirmdeletepage, local_byblos{{/str}}');">
+                  data-byblos-confirm="{{#str}}confirmdeletepage, local_byblos{{/str}}">
                 <input type="hidden" name="sesskey" value="{{sesskey}}">
                 <input type="hidden" name="action" value="page">
                 <input type="hidden" name="id" value="{{page.id}}">
@@ -177,4 +196,80 @@ Example context (json):
         {{/isowner}}
     </div>
     {{/has_sections}}
+
+    {{! ---- Page feedback (logged-in only; never in preview/public) ---- }}
+    {{#show_feedback_panel}}
+    <div class="byblos-feedback card mt-4" data-byblos-feedback="1" data-pageid="{{page.id}}">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5 class="mb-0">
+                    <i class="fa fa-comments-o"></i> {{#str}}feedback_heading, local_byblos{{/str}}
+                </h5>
+                {{#can_set_feedback_mode}}
+                <div class="form-inline byblos-feedback-modecontrol">
+                    <label class="small text-muted mr-2 mb-0">{{#str}}feedback_mode_label, local_byblos{{/str}}</label>
+                    <select class="form-control form-control-sm byblos-feedback-mode">
+                        <option value="off" {{#feedback_mode_off}}selected{{/feedback_mode_off}}>{{#str}}feedback_mode_off, local_byblos{{/str}}</option>
+                        <option value="teachers" {{#feedback_mode_teachers}}selected{{/feedback_mode_teachers}}>{{#str}}feedback_mode_teachers, local_byblos{{/str}}</option>
+                        <option value="cohort" {{#feedback_mode_cohort}}selected{{/feedback_mode_cohort}}>{{#str}}feedback_mode_cohort, local_byblos{{/str}}</option>
+                    </select>
+                </div>
+                {{/can_set_feedback_mode}}
+            </div>
+
+            {{#feedback_visible}}
+            <div class="byblos-feedback-list">
+                {{#has_feedback}}
+                {{#feedback}}
+                <div class="byblos-feedback-item border-bottom py-2 {{#is_hidden}}byblos-feedback-itemhidden{{/is_hidden}}"
+                     data-feedbackid="{{id}}">
+                    <div class="d-flex justify-content-between">
+                        <strong class="small">
+                            {{authorname}}
+                            {{#is_teacher}}<span class="badge badge-info">{{#str}}feedback_role_teacher, local_byblos{{/str}}</span>{{/is_teacher}}
+                            {{^is_teacher}}<span class="badge badge-secondary">{{#str}}feedback_role_peer, local_byblos{{/str}}</span>{{/is_teacher}}
+                            {{#is_hidden}}<span class="badge badge-warning">{{#str}}feedback_hidden_badge, local_byblos{{/str}}</span>{{/is_hidden}}
+                        </strong>
+                        <small class="text-muted">{{timecreated}}</small>
+                    </div>
+                    <div class="byblos-feedback-body small">{{{body}}}</div>
+                    <div class="byblos-feedback-actions">
+                        {{#can_set_feedback_mode}}
+                        {{#is_hidden}}
+                        <button type="button" class="btn btn-link btn-sm byblos-feedback-show p-0 mr-2">{{#str}}feedback_show, local_byblos{{/str}}</button>
+                        {{/is_hidden}}
+                        {{^is_hidden}}
+                        <button type="button" class="btn btn-link btn-sm byblos-feedback-hide p-0 mr-2">{{#str}}feedback_hide, local_byblos{{/str}}</button>
+                        {{/is_hidden}}
+                        <button type="button" class="btn btn-link btn-sm text-danger byblos-feedback-delete p-0">{{#str}}delete, core{{/str}}</button>
+                        {{/can_set_feedback_mode}}
+                        {{^can_set_feedback_mode}}
+                        {{#iscurrentuser}}
+                        <button type="button" class="btn btn-link btn-sm text-danger byblos-feedback-delete p-0">{{#str}}delete, core{{/str}}</button>
+                        {{/iscurrentuser}}
+                        {{/can_set_feedback_mode}}
+                    </div>
+                </div>
+                {{/feedback}}
+                {{/has_feedback}}
+                {{^has_feedback}}
+                <p class="text-muted small byblos-feedback-empty">{{#str}}feedback_none, local_byblos{{/str}}</p>
+                {{/has_feedback}}
+            </div>
+            {{/feedback_visible}}
+
+            {{#can_leave_feedback}}
+            <form class="byblos-feedback-form mt-3">
+                <div class="form-group mb-2">
+                    <textarea class="form-control byblos-feedback-input" rows="3"
+                              placeholder="{{#str}}feedback_placeholder, local_byblos{{/str}}"></textarea>
+                </div>
+                <button type="button" class="btn btn-primary btn-sm byblos-feedback-submit">
+                    <i class="fa fa-paper-plane"></i> {{#str}}feedback_post, local_byblos{{/str}}
+                </button>
+            </form>
+            {{/can_leave_feedback}}
+        </div>
+    </div>
+    {{/show_feedback_panel}}
 </div>

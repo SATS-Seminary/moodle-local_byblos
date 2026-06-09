@@ -29,6 +29,7 @@ require_once(__DIR__ . '/../../config.php');
 use local_byblos\page;
 use local_byblos\collection;
 use local_byblos\artefact;
+use local_byblos\goal;
 use local_byblos\peer as byblos_peer;
 use local_byblos\submission as byblos_submission;
 
@@ -132,7 +133,7 @@ foreach ($artefacts as $a) {
         'id'          => $a->id,
         'title'       => format_string($a->title, true, ['escape' => false]),
         'type'        => $a->artefacttype,
-        'typelabel'   => get_string('type_' . $a->artefacttype, 'local_byblos'),
+        'typelabel'   => get_string('artefacttype_' . $a->artefacttype, 'local_byblos'),
         'description' => format_text($a->description, FORMAT_HTML),
         'viewurl'     => (new moodle_url('/local/byblos/artefact.php', ['id' => $a->id]))->out(false),
         'editurl'     => (new moodle_url('/local/byblos/artefact.php', ['id' => $a->id, 'action' => 'edit']))->out(false),
@@ -140,6 +141,29 @@ foreach ($artefacts as $a) {
         'timecreated' => userdate($a->timecreated),
     ];
 }
+
+// Learning goals for the current user (self-regulated-learning loop).
+$goals = goal::list_by_user((int) $USER->id);
+$goaldata = [];
+foreach ($goals as $g) {
+    $goaldata[] = [
+        'id'          => (int) $g->id,
+        'title'       => format_string($g->title, true, ['escape' => false]),
+        'description' => format_text($g->description ?? '', FORMAT_HTML),
+        'status'      => $g->status,
+        'statuslabel' => get_string('goalstatus_' . $g->status, 'local_byblos'),
+        'is_active'   => ($g->status === 'active'),
+        'is_achieved' => ($g->status === 'achieved'),
+        'is_archived' => ($g->status === 'archived'),
+        'progress'    => (int) $g->progress,
+        'hastarget'   => !empty($g->targetdate),
+        'targetdate'  => !empty($g->targetdate) ? userdate((int) $g->targetdate, get_string('strftimedate', 'langconfig')) : '',
+        'links'       => goal::get_links((int) $g->id),
+        'haslinks'    => !empty(goal::get_links((int) $g->id)),
+    ];
+}
+$cancreategoals = has_capability('local/byblos:managegoals', $context);
+$goaltemplates = $cancreategoals ? goal::quickstart_templates() : [];
 
 // Pending peer reviews assigned to the current user. Optionally filtered by
 // assignmentid so a link from a specific mod_assign page lands on a focused list.
@@ -210,9 +234,14 @@ $data = [
     'tab_pages'       => ($tab === 'pages'),
     'tab_collections' => ($tab === 'collections'),
     'tab_artefacts'   => ($tab === 'artefacts'),
+    'tab_goals'       => ($tab === 'goals'),
     'tab_reviews'     => ($tab === 'reviews'),
     'reviews'         => $reviewdata,
     'has_reviews'     => !empty($reviewdata),
+    'goals'           => $goaldata,
+    'has_goals'       => !empty($goaldata),
+    'cancreategoals'  => $cancreategoals,
+    'goaltemplates'   => $goaltemplates,
     'pages'           => $pagedata,
     'has_pages'       => !empty($pagedata),
     'collections'     => $coldata,
@@ -224,10 +253,18 @@ $data = [
     'newpageurl'      => (new moodle_url('/local/byblos/newpage.php'))->out(false),
     'newartefacturl'  => (new moodle_url('/local/byblos/artefact.php', ['action' => 'edit']))->out(false),
     'actionurl'       => (new moodle_url('/local/byblos/view.php', ['tab' => 'collections']))->out(false),
+    'docsurl'         => (new moodle_url('/local/byblos/docs.php'))->out(false),
     'sesskey'         => sesskey(),
     'importmsgs'      => $importmsgs,
     'has_importmsgs'  => !empty($importmsgs),
 ];
+
+$PAGE->requires->js_call_amd('local_byblos/goals', 'init', [[
+    'userid'    => (int) $USER->id,
+    'sesskey'   => sesskey(),
+    'templates' => $goaltemplates,
+]]);
+$PAGE->requires->js_call_amd('local_byblos/confirm', 'init');
 
 echo $OUTPUT->header();
 echo $OUTPUT->render_from_template('local_byblos/dashboard', $data);

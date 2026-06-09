@@ -20,7 +20,9 @@
  * URL: /local/byblos/artefact.php?id=X (view)
  *      /local/byblos/artefact.php?action=edit&id=X (edit)
  *      /local/byblos/artefact.php?action=edit (create new)
- *      POST to save.
+ *
+ * The create/edit form is a type-aware moodleform that self-posts here; the
+ * fields shown adapt to the chosen artefact type.
  *
  * @package    local_byblos
  * @copyright  2026 South African Theological Seminary
@@ -30,6 +32,9 @@
 require_once(__DIR__ . '/../../config.php');
 
 use local_byblos\artefact as artefact_model;
+use local_byblos\artefact_type;
+use local_byblos\file_manager;
+use local_byblos\form\artefact_form;
 
 require_login();
 $context = context_system::instance();
@@ -40,45 +45,10 @@ $action = optional_param('action', '', PARAM_ALPHA);
 
 $PAGE->set_context($context);
 
-// Handle POST: save artefact.
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    require_sesskey();
-    require_capability('local/byblos:createpage', $context);
-
-    $saveid = optional_param('id', 0, PARAM_INT);
-    $type   = required_param('type', PARAM_ALPHANUMEXT);
-    $title  = required_param('title', PARAM_TEXT);
-    $desc   = optional_param('description', '', PARAM_TEXT);
-    $content = optional_param('content', '', PARAM_RAW);
-
-    if ($saveid > 0) {
-        // Update existing.
-        $existing = artefact_model::get($saveid);
-        if (!$existing || (int) $existing->userid !== (int) $USER->id) {
-            throw new moodle_exception('accessdenied', 'local_byblos');
-        }
-        artefact_model::update($saveid, [
-            'type'        => $type,
-            'title'       => $title,
-            'description' => $desc,
-            'content'     => $content,
-        ]);
-        $redirectid = $saveid;
-    } else {
-        // Create new.
-        $redirectid = artefact_model::create($USER->id, $type, $title, $desc, $content);
-    }
-
-    redirect(
-        new moodle_url('/local/byblos/artefact.php', ['id' => $redirectid]),
-        get_string('artefactsaved', 'local_byblos'),
-        null,
-        \core\output\notification::NOTIFY_SUCCESS
-    );
-}
-
-// Edit mode.
+// Create / edit mode. The moodleform self-posts back to this branch.
 if ($action === 'edit') {
+    global $USER, $CFG;
+    require_once($CFG->libdir . '/filelib.php');
     require_capability('local/byblos:createpage', $context);
 
     $artefact = null;
@@ -87,43 +57,140 @@ if ($action === 'edit') {
         if (!$artefact || (int) $artefact->userid !== (int) $USER->id) {
             throw new moodle_exception('accessdenied', 'local_byblos');
         }
-        $PAGE->set_title(get_string('editartefact', 'local_byblos'));
-        $PAGE->set_heading(get_string('editartefact', 'local_byblos'));
-    } else {
-        $PAGE->set_title(get_string('newartefact', 'local_byblos'));
-        $PAGE->set_heading(get_string('newartefact', 'local_byblos'));
     }
+    $isedit = ($id > 0);
+    $usercontext = context_user::instance($USER->id);
+    $itemid = $isedit ? $id : null;
 
+    $pagetitle = get_string($isedit ? 'editartefact' : 'newartefact', 'local_byblos');
     $PAGE->set_url(new moodle_url('/local/byblos/artefact.php', ['action' => 'edit', 'id' => $id]));
+    $PAGE->set_title($pagetitle);
+    $PAGE->set_heading($pagetitle);
 
-    // Artefact types for the selector.
-    $types = ['text', 'file', 'image', 'badge', 'course_completion', 'blog_entry'];
-    $typedata = [];
-    foreach ($types as $t) {
-        $typedata[] = [
-            'value'    => $t,
-            'label'    => get_string('type_' . $t, 'local_byblos'),
-            'selected' => ($artefact && $artefact->type === $t),
-        ];
+    $form = new artefact_form(new moodle_url('/local/byblos/artefact.php', ['action' => 'edit', 'id' => $id]));
+
+    if ($form->is_cancelled()) {
+        redirect($isedit
+            ? new moodle_url('/local/byblos/artefact.php', ['id' => $id])
+            : new moodle_url('/local/byblos/view.php', ['tab' => 'artefacts']));
+    } else if ($data = $form->get_data()) {
+        $type  = $data->type;
+        $title = trim($data->title);
+        $desc  = $data->description ?? '';
+
+        // A row id is needed to key the files, so create new artefacts first.
+        $artefactid = $isedit
+            ? $id
+            : artefact_model::create((int) $USER->id, $type, $title, $desc, '');
+
+        $content = '';
+        $fileid  = null;
+
+        if (in_array($type, ['text', 'audio', 'video'], true)) {
+            $content = file_save_draft_area_files(
+                $data->content_editor['itemid'],
+                $usercontext->id,
+                'local_byblos',
+                file_manager::FILEAREA_ARTEFACT,
+                $artefactid,
+                artefact_form::editor_options(),
+                $data->content_editor['text']
+            );
+        } else if ($type === 'image' || $type === 'file') {
+            $draftid = ($type === 'image') ? $data->imagefile : $data->attachment;
+            $options = ($type === 'image') ? artefact_form::image_options() : artefact_form::file_options();
+            file_save_draft_area_files(
+                $draftid,
+                $usercontext->id,
+                'local_byblos',
+                file_manager::FILEAREA_ARTEFACT,
+                $artefactid,
+                $options
+            );
+            $fs = get_file_storage();
+            $files = $fs->get_area_files(
+                $usercontext->id,
+                'local_byblos',
+                file_manager::FILEAREA_ARTEFACT,
+                $artefactid,
+                'filepath, filename',
+                false
+            );
+            $stored = reset($files);
+            $fileid = $stored ? (int) $stored->get_id() : null;
+        } else if ($type === 'link' || $type === 'embed') {
+            $content = $data->url ?? '';
+        }
+
+        artefact_model::update($artefactid, [
+            'artefacttype' => $type,
+            'title'        => $title,
+            'description'  => $desc,
+            'content'      => $content,
+            'fileid'       => $fileid,
+        ]);
+
+        redirect(
+            new moodle_url('/local/byblos/artefact.php', ['id' => $artefactid]),
+            get_string('artefactsaved', 'local_byblos'),
+            null,
+            \core\output\notification::NOTIFY_SUCCESS
+        );
+    } else {
+        // Display: seed the form with existing values and prepared draft areas.
+        $toform = ['id' => $id];
+        if ($artefact) {
+            $toform['type']        = $artefact->artefacttype;
+            $toform['title']       = $artefact->title;
+            $toform['description'] = $artefact->description;
+        }
+
+        $iseditorcontent = $artefact
+            && in_array($artefact->artefacttype, ['text', 'audio', 'video'], true);
+        $editordraft = 0;
+        $editortext = file_prepare_draft_area(
+            $editordraft,
+            $usercontext->id,
+            'local_byblos',
+            file_manager::FILEAREA_ARTEFACT,
+            $itemid,
+            artefact_form::editor_options(),
+            $iseditorcontent ? ($artefact->content ?? '') : ''
+        );
+        $toform['content_editor'] = ['text' => $editortext, 'format' => FORMAT_HTML, 'itemid' => $editordraft];
+
+        $imagedraft = 0;
+        file_prepare_draft_area(
+            $imagedraft,
+            $usercontext->id,
+            'local_byblos',
+            file_manager::FILEAREA_ARTEFACT,
+            $itemid,
+            artefact_form::image_options()
+        );
+        $toform['imagefile'] = $imagedraft;
+
+        $filedraft = 0;
+        file_prepare_draft_area(
+            $filedraft,
+            $usercontext->id,
+            'local_byblos',
+            file_manager::FILEAREA_ARTEFACT,
+            $itemid,
+            artefact_form::file_options()
+        );
+        $toform['attachment'] = $filedraft;
+
+        if ($artefact && in_array($artefact->artefacttype, ['link', 'embed'], true)) {
+            $toform['url'] = $artefact->content;
+        }
+
+        $form->set_data($toform);
+
+        echo $OUTPUT->header();
+        $form->display();
+        echo $OUTPUT->footer();
     }
-
-    $data = [
-        'id'          => $artefact ? $artefact->id : 0,
-        'title'       => $artefact ? $artefact->title : '',
-        'description' => $artefact ? $artefact->description : '',
-        'content'     => $artefact ? $artefact->content : '',
-        'types'       => $typedata,
-        'is_edit'     => ($id > 0),
-        'actionurl'   => (new moodle_url('/local/byblos/artefact.php'))->out(false),
-        'cancelurl'   => ($id > 0)
-            ? (new moodle_url('/local/byblos/artefact.php', ['id' => $id]))->out(false)
-            : (new moodle_url('/local/byblos/view.php', ['tab' => 'artefacts']))->out(false),
-        'sesskey'     => sesskey(),
-    ];
-
-    echo $OUTPUT->header();
-    echo $OUTPUT->render_from_template('local_byblos/artefact_edit', $data);
-    echo $OUTPUT->footer();
     exit;
 }
 
@@ -143,23 +210,27 @@ $PAGE->set_url(new moodle_url('/local/byblos/artefact.php', ['id' => $id]));
 $PAGE->set_title(format_string($artefact->title));
 $PAGE->set_heading(format_string($artefact->title));
 
+$handler = artefact_type::get($artefact->artefacttype);
+
 $data = [
     'artefact' => [
         'id'          => $artefact->id,
         'title'       => format_string($artefact->title, true, ['escape' => false]),
-        'type'        => $artefact->artefacttype,
-        'typelabel'   => get_string('type_' . $artefact->artefacttype, 'local_byblos'),
-        'description' => format_text($artefact->description, FORMAT_HTML),
-        'content'     => format_text($artefact->content, FORMAT_HTML),
-        'has_content' => !empty(trim($artefact->content ?? '')),
+        'typelabel'   => $handler ? $handler->get_display_name() : $artefact->artefacttype,
+        'description' => format_text($artefact->description ?? '', FORMAT_HTML),
         'timecreated' => userdate($artefact->timecreated),
     ],
-    'isowner'  => $isowner,
-    'editurl'  => (new moodle_url('/local/byblos/artefact.php', ['id' => $id, 'action' => 'edit']))->out(false),
+    'rendered'  => $handler
+        ? $handler->render($artefact)
+        : format_text($artefact->content ?? '', FORMAT_HTML),
+    'isowner'   => $isowner,
+    'editurl'   => (new moodle_url('/local/byblos/artefact.php', ['id' => $id, 'action' => 'edit']))->out(false),
     'deleteurl' => (new moodle_url('/local/byblos/delete.php'))->out(false),
-    'dashurl'  => (new moodle_url('/local/byblos/view.php', ['tab' => 'artefacts']))->out(false),
-    'sesskey'  => sesskey(),
+    'dashurl'   => (new moodle_url('/local/byblos/view.php', ['tab' => 'artefacts']))->out(false),
+    'sesskey'   => sesskey(),
 ];
+
+$PAGE->requires->js_call_amd('local_byblos/confirm', 'init');
 
 echo $OUTPUT->header();
 echo $OUTPUT->render_from_template('local_byblos/artefact_view', $data);

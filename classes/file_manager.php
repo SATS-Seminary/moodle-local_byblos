@@ -40,8 +40,17 @@ class file_manager {
     /** @var string Filearea for portfolio exports. */
     public const FILEAREA_EXPORTS = 'exports';
 
+    /** @var string Filearea for reflection-section media (recorded audio/video). */
+    public const FILEAREA_REFLECTION = 'reflection';
+
+    /** @var string Filearea for artefact files and recorded media (itemid = artefact id). */
+    public const FILEAREA_ARTEFACT = 'artefact';
+
     /** @var int Maximum upload size in bytes (10 MB). */
     public const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+
+    /** @var int Maximum reflection-media size in bytes (200 MB; recordings are large). */
+    public const MAX_REFLECTION_BYTES = 200 * 1024 * 1024;
 
     /** @var string[] Allowed MIME type prefixes. */
     private const ALLOWED_MIME_PREFIXES = ['image/'];

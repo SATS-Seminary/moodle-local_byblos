@@ -1,0 +1,102 @@
+{{!
+    @template local_byblos/docs/usecase_professional
+
+    Use case: professional / skills showcase portfolio for potential employers.
+
+    Context variables:
+    - links (object) Map of topic key => URL.
+    - dashurl (string) Portfolio dashboard URL.
+    - newpageurl (string) New-page wizard URL.
+
+    @package    local_byblos
+    @copyright  2026 South African Theological Seminary
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+        "dashurl": "#",
+        "newpageurl": "#",
+        "links": {
+            "index": "#", "getting_started": "#", "building_pages": "#",
+            "publishing": "#", "collections": "#", "sharing": "#",
+            "assessment": "#", "usecase_programme": "#", "usecase_course": "#",
+            "usecase_professional": "#"
+        }
+    }
+}}
+<div class="byblos-docs-article">
+
+    <h1>{{#str}}docs_topic_usecase_professional, local_byblos{{/str}}</h1>
+    <p class="byblos-docs-lead">
+        A professional showcase presents your skills and best work to people outside your institution, most often potential employers. The emphasis shifts from reflection to <em>polish and proof</em>:
+        a strong first impression, clear evidence of what you can do, and an easy way for someone with no
+        Moodle account to view it.
+    </p>
+
+    <h2>Example</h2>
+    <p>
+        <em>Sipho is applying for graduate roles. He builds a one-page showcase: a hero banner with his
+        name and headline, a skills section, a gallery of three projects, a couple of headline stats, and
+        a "Get in touch" button. He shares it with a private public link and pastes that link into his CV
+        and LinkedIn.</em>
+    </p>
+
+    <h2>Step 1: Start from a presentation-led template</h2>
+    <ol class="byblos-docs-steps">
+        <li>Create a new page (see <a href="{{{links.building_pages}}}">Building pages</a>).</li>
+        <li>Choose <strong>Professional Profile</strong> or <strong>Project Showcase</strong>: both lead with a strong header and are built for presentation rather than reflection.</li>
+    </ol>
+
+    <h2>Step 2: Lead with impact</h2>
+    <ul class="byblos-docs-deflist">
+        <li><strong>Hero banner</strong>: your name, a one-line headline ("Final-year data science student"), and a photo. This is the first thing a recruiter sees.</li>
+        <li><strong>Skills</strong>: list your strengths with honest named levels (Novice → Expert), not vague percentages.</li>
+        <li><strong>Gallery</strong> / <strong>Project Showcase</strong> sections, show your best two or three projects with images and short descriptions.</li>
+        <li><strong>Stats</strong>: a few headline numbers, each clearly labelled with what it measures.</li>
+        <li><strong>Citations / Files / Social links</strong>: link out to published work, downloadable samples, LinkedIn, or a GitHub profile.</li>
+        <li><strong>Call to action</strong>: a "Contact me" or "Email me" button so an interested reader can act immediately.</li>
+    </ul>
+
+    <figure class="byblos-docs-figure">
+        <div class="byblos-docs-shot" role="img" aria-label="A finished professional showcase page">
+            <i class="fa fa-camera" aria-hidden="true"></i>
+            <span>Screenshot: a finished professional showcase page, hero banner with name and headline at the top, a skills section, a three-up project gallery, headline stats, and a "Get in touch" call-to-action button.</span>
+        </div>
+        <figcaption>Figure 1: A polished, employer-ready showcase page.</figcaption>
+    </figure>
+
+    <h2>Step 3: Make it look the part</h2>
+    <ol class="byblos-docs-steps">
+        <li>Open the editor settings panel and choose a <strong>theme</strong> that fits the impression you want, clean and corporate, or bold and creative.</li>
+        <li>Keep it tight: a recruiter skims. One strong page usually beats a sprawling collection. If you do need more than one page, gather them into a <a href="{{{links.collections}}}">collection</a>.</li>
+        <li>Preview as a viewer to check it reads well to someone who is not you.</li>
+    </ol>
+
+    <h2>Step 4: Publish and share beyond Moodle</h2>
+    <ol class="byblos-docs-steps">
+        <li><a href="{{{links.publishing}}}">Publish</a> the page.</li>
+        <li>Open <strong>{{#str}}sharethispage, local_byblos{{/str}}</strong> and choose <strong>{{#str}}share_public, local_byblos{{/str}}</strong>. {{#str}}share_public_hint, local_byblos{{/str}}</li>
+        <li>Copy the generated link and put it wherever employers will see it, your CV, email signature, or LinkedIn.</li>
+    </ol>
+
+    <figure class="byblos-docs-figure">
+        <div class="byblos-docs-shot" role="img" aria-label="Creating a public link">
+            <i class="fa fa-camera" aria-hidden="true"></i>
+            <span>Screenshot: the sharing screen with "Public link" selected, showing the generated secret URL and a copy button.</span>
+        </div>
+        <figcaption>Figure 2: Generating a private public link for people outside Moodle.</figcaption>
+    </figure>
+
+    <div class="byblos-docs-note">
+        <strong>Public links are a privilege your site controls.</strong> If you don't see the
+        "{{#str}}share_public, local_byblos{{/str}}" option, public sharing is turned off on your site, ask your administrator, or share with specific people instead. Treat any public link like a
+        password: anyone who has it can view the page, and you can revoke it at any time from the same
+        sharing screen.
+    </div>
+
+    <div class="byblos-docs-tip">
+        <strong>Keep it current.</strong> Because the public link stays the same, you can keep editing the
+        published page, add a new project, refresh your skills, and the link in your CV always shows the
+        latest version.
+    </div>
+</div>

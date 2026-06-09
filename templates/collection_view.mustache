@@ -66,7 +66,7 @@ Example context (json):
                 <i class="fa fa-share-alt"></i> {{#str}}sharethiscollection, local_byblos{{/str}}
             </a>
             <form method="post" action="{{{deleteurl}}}" class="d-inline"
-                  onsubmit="return confirm('{{#str}}confirmdeletecollection, local_byblos{{/str}}');">
+                  data-byblos-confirm="{{#str}}confirmdeletecollection, local_byblos{{/str}}">
                 <input type="hidden" name="sesskey" value="{{sesskey}}">
                 <input type="hidden" name="action" value="collection">
                 <input type="hidden" name="id" value="{{collection.id}}">

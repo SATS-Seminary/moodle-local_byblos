@@ -334,4 +334,104 @@ class share {
             'collections' => $collections,
         ];
     }
+
+    /**
+     * Whether a logged-in user may leave feedback on a page.
+     *
+     * Requires: feedback enabled on the page, the user can already view the page,
+     * the user is not the owner, and the page's feedback scope admits them
+     * (teachers-only, or cohort = shares the page's course/group).
+     *
+     * @param int $userid User ID (must be a real, logged-in user).
+     * @param int $pageid Page ID.
+     * @return bool
+     */
+    public static function can_leave_feedback(int $userid, int $pageid): bool {
+        global $DB;
+
+        if ($userid <= 0) {
+            return false;
+        }
+
+        $page = $DB->get_record('local_byblos_page', ['id' => $pageid]);
+        if (!$page || ($page->feedback ?? 'off') === 'off') {
+            return false;
+        }
+        if ((int) $page->userid === $userid) {
+            return false;
+        }
+        if (!self::can_view_page($userid, $pageid)) {
+            return false;
+        }
+
+        if ($page->feedback === 'teachers') {
+            return self::is_teacher_for_page($userid, $pageid);
+        }
+
+        // Cohort: the user must share the course/group the page is shared through.
+        return self::shares_cohort_with_page($userid, $pageid);
+    }
+
+    /**
+     * Resolve the role a feedback author gets on a page: teacher or peer.
+     *
+     * @param int $userid User ID.
+     * @param int $pageid Page ID.
+     * @return string 'teacher' or 'peer'.
+     */
+    public static function feedback_author_role(int $userid, int $pageid): string {
+        return self::is_teacher_for_page($userid, $pageid) ? 'teacher' : 'peer';
+    }
+
+    /**
+     * Whether a user counts as a "teacher" for a page's feedback: holds the
+     * system viewshared capability, or mod/assign:grade on a course the page is
+     * tagged to.
+     *
+     * @param int $userid User ID.
+     * @param int $pageid Page ID.
+     * @return bool
+     */
+    private static function is_teacher_for_page(int $userid, int $pageid): bool {
+        global $DB;
+
+        if (has_capability('local/byblos:viewshared', \context_system::instance(), $userid)) {
+            return true;
+        }
+        $courseids = $DB->get_fieldset_select('local_byblos_page_course', 'courseid', 'pageid = ?', [$pageid]);
+        foreach ($courseids as $cid) {
+            $context = \context_course::instance((int) $cid, IGNORE_MISSING);
+            if ($context && has_capability('mod/assign:grade', $context, $userid)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Whether a user is in the cohort a page is shared with — enrolled in a
+     * course-share's course, or a member of a group-share's group.
+     *
+     * @param int $userid User ID.
+     * @param int $pageid Page ID.
+     * @return bool
+     */
+    private static function shares_cohort_with_page(int $userid, int $pageid): bool {
+        global $DB;
+
+        $courseshares = $DB->get_records(self::TABLE, ['pageid' => $pageid, 'sharetype' => 'course']);
+        foreach ($courseshares as $cs) {
+            $context = \context_course::instance((int) $cs->sharevalue, IGNORE_MISSING);
+            if ($context && is_enrolled($context, $userid)) {
+                return true;
+            }
+        }
+        $groupshares = $DB->get_records(self::TABLE, ['pageid' => $pageid, 'sharetype' => 'group']);
+        foreach ($groupshares as $gs) {
+            if (groups_is_member((int) $gs->sharevalue, $userid)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

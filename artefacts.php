@@ -45,7 +45,7 @@ foreach ($artefacts as $a) {
         'id'          => $a->id,
         'title'       => format_string($a->title, true, ['escape' => false]),
         'type'        => $a->artefacttype,
-        'typelabel'   => get_string('type_' . $a->artefacttype, 'local_byblos'),
+        'typelabel'   => get_string('artefacttype_' . $a->artefacttype, 'local_byblos'),
         'description' => format_text($a->description, FORMAT_HTML),
         'viewurl'     => (new moodle_url('/local/byblos/artefact.php', ['id' => $a->id]))->out(false),
         'editurl'     => (new moodle_url('/local/byblos/artefact.php', ['id' => $a->id, 'action' => 'edit']))->out(false),
@@ -55,12 +55,14 @@ foreach ($artefacts as $a) {
 }
 
 // Type filter tabs.
-$alltypes = ['', 'text', 'file', 'image', 'badge', 'course_completion', 'blog_entry'];
+$alltypes = ['', 'text', 'image', 'file', 'link', 'audio', 'video', 'embed',
+    'badge', 'course_completion', 'blog_entry'];
 $typefilters = [];
 foreach ($alltypes as $t) {
     $typefilters[] = [
         'value'  => $t,
-        'label'  => ($t === '') ? get_string('type_all', 'local_byblos') : get_string('type_' . $t, 'local_byblos'),
+        'label'  => ($t === '') ? get_string('type_all', 'local_byblos')
+            : get_string('artefacttype_' . $t, 'local_byblos'),
         'active' => ($t === $type),
         'url'    => (new moodle_url('/local/byblos/artefacts.php', $t ? ['type' => $t] : []))->out(false),
     ];
@@ -74,6 +76,8 @@ $data = [
     'dashurl'        => (new moodle_url('/local/byblos/view.php'))->out(false),
     'sesskey'        => sesskey(),
 ];
+
+$PAGE->requires->js_call_amd('local_byblos/confirm', 'init');
 
 echo $OUTPUT->header();
 echo $OUTPUT->render_from_template('local_byblos/artefacts_list', $data);

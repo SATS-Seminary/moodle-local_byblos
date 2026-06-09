@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/byblos/db" VERSION="2026042000" COMMENT="XMLDB schema for local_byblos ePortfolio plugin."
+<XMLDB PATH="local/byblos/db" VERSION="2026060702" COMMENT="XMLDB schema for local_byblos ePortfolio plugin."
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -39,6 +39,7 @@
         <FIELD NAME="layoutkey"    TYPE="char" LENGTH="50"  NOTNULL="true" DEFAULT="single" SEQUENCE="false"/>
         <FIELD NAME="themekey"     TYPE="char" LENGTH="50"  NOTNULL="true" DEFAULT="clean" SEQUENCE="false"/>
         <FIELD NAME="status"       TYPE="char" LENGTH="20"  NOTNULL="true" DEFAULT="draft" SEQUENCE="false"/>
+        <FIELD NAME="feedback"     TYPE="char" LENGTH="20"  NOTNULL="true" DEFAULT="off" SEQUENCE="false" COMMENT="Viewer feedback mode: off | teachers | cohort."/>
         <FIELD NAME="timecreated"  TYPE="int"  LENGTH="10"  NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int"  LENGTH="10"  NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
@@ -245,6 +246,70 @@
         <INDEX NAME="ix_assignmentid_reviewer" UNIQUE="false" FIELDS="assignmentid, reviewerid"/>
         <INDEX NAME="ix_assignmentid_reviewee" UNIQUE="false" FIELDS="assignmentid, revieweeuserid"/>
         <INDEX NAME="uix_assign_reviewer_reviewee" UNIQUE="true" FIELDS="assignmentid, reviewerid, revieweeuserid"/>
+      </INDEXES>
+    </TABLE>
+
+    <!-- Goal: a self-regulated-learning goal the user sets and tracks over time -->
+    <TABLE NAME="local_byblos_goal" COMMENT="Stores user learning goals tracked over time.">
+      <FIELDS>
+        <FIELD NAME="id"           TYPE="int"  LENGTH="10"  NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="userid"       TYPE="int"  LENGTH="10"  NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="title"        TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="description"  TYPE="text"              NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="status"       TYPE="char" LENGTH="20"  NOTNULL="true" DEFAULT="active" SEQUENCE="false" COMMENT="active | achieved | archived"/>
+        <FIELD NAME="targetdate"   TYPE="int"  LENGTH="10"  NOTNULL="false" SEQUENCE="false" COMMENT="Optional target unix timestamp."/>
+        <FIELD NAME="progress"     TYPE="int"  LENGTH="3"   NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="0-100 percent."/>
+        <FIELD NAME="sortorder"    TYPE="int"  LENGTH="10"  NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timecreated"  TYPE="int"  LENGTH="10"  NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int"  LENGTH="10"  NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="fk_userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="ix_userid_status" UNIQUE="false" FIELDS="userid, status"/>
+        <INDEX NAME="ix_userid_sort" UNIQUE="false" FIELDS="userid, sortorder"/>
+      </INDEXES>
+    </TABLE>
+
+    <!-- Goal evidence link: cites an artefact or page as evidence for a goal -->
+    <TABLE NAME="local_byblos_goal_link" COMMENT="Links evidence (artefact or page) to a goal.">
+      <FIELDS>
+        <FIELD NAME="id"          TYPE="int"  LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="goalid"      TYPE="int"  LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="linktype"    TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="artefact | page"/>
+        <FIELD NAME="linkid"      TYPE="int"  LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="artefact.id or page.id (polymorphic)."/>
+        <FIELD NAME="timecreated" TYPE="int"  LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="fk_goalid" TYPE="foreign" FIELDS="goalid" REFTABLE="local_byblos_goal" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="uix_goal_link" UNIQUE="true" FIELDS="goalid, linktype, linkid"/>
+      </INDEXES>
+    </TABLE>
+
+    <!-- Page feedback: logged-in, owner-moderated feedback left on a shared page -->
+    <TABLE NAME="local_byblos_pagefeedback" COMMENT="Logged-in, owner-moderated feedback left on a shared page.">
+      <FIELDS>
+        <FIELD NAME="id"           TYPE="int"  LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="pageid"       TYPE="int"  LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="authorid"     TYPE="int"  LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="authorrole"   TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="peer" SEQUENCE="false" COMMENT="teacher | peer"/>
+        <FIELD NAME="body"         TYPE="text"             NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="visible"      TYPE="int"  LENGTH="1"  NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="timecreated"  TYPE="int"  LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int"  LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="fk_pageid" TYPE="foreign" FIELDS="pageid" REFTABLE="local_byblos_page" REFFIELDS="id"/>
+        <KEY NAME="fk_authorid" TYPE="foreign" FIELDS="authorid" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="ix_pageid_visible" UNIQUE="false" FIELDS="pageid, visible"/>
       </INDEXES>
     </TABLE>
 

@@ -1,0 +1,98 @@
+{{!
+    @template local_byblos/docs
+
+    Documentation hub shell. Two-pane layout: a sidebar of topic links (grouped
+    into Guides and Use cases) on the left, and the rendered topic body on the
+    right, with a prev/next footer.
+
+    Context variables:
+    - title (string) Current topic title.
+    - istopic (bool) False on the landing page (hides the breadcrumb back-link).
+    - docshome (string) URL of the documentation landing page.
+    - dashurl (string) URL back to the portfolio dashboard.
+    - navgroups (array) [{label, items: [{title, url, active}]}].
+    - content (string) Pre-rendered topic body HTML.
+    - hasprev / prev (bool / {title, url}) Previous-topic link.
+    - hasnext / next (bool / {title, url}) Next-topic link.
+
+    @package    local_byblos
+    @copyright  2026 South African Theological Seminary
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+        "title": "Getting started",
+        "istopic": true,
+        "docshome": "#",
+        "dashurl": "#",
+        "navgroups": [
+            {"label": "Guides", "items": [
+                {"title": "Getting started", "url": "#", "active": true},
+                {"title": "Building pages", "url": "#", "active": false}
+            ]},
+            {"label": "Use cases", "items": [
+                {"title": "Programme portfolio", "url": "#", "active": false}
+            ]}
+        ],
+        "content": "<p>Body HTML.</p>",
+        "hasprev": true,
+        "prev": {"title": "Overview", "url": "#"},
+        "hasnext": true,
+        "next": {"title": "Building pages", "url": "#"}
+    }
+}}
+<div class="byblos-docs">
+
+    <div class="byblos-docs-topbar d-flex justify-content-between align-items-center mb-3">
+        <nav class="byblos-docs-crumbs" aria-label="breadcrumb">
+            <a href="{{{docshome}}}"><i class="fa fa-book"></i> {{#str}}docs_title, local_byblos{{/str}}</a>
+            {{#istopic}}
+            <span class="byblos-docs-crumb-sep">/</span>
+            <span class="byblos-docs-crumb-current">{{title}}</span>
+            {{/istopic}}
+        </nav>
+        <a href="{{{dashurl}}}" class="btn btn-outline-secondary btn-sm">
+            <i class="fa fa-arrow-left"></i> {{#str}}dashboard, local_byblos{{/str}}
+        </a>
+    </div>
+
+    <div class="byblos-docs-layout">
+        <aside class="byblos-docs-sidebar">
+            {{#navgroups}}
+            <div class="byblos-docs-navgroup">
+                <h6 class="byblos-docs-navgroup-label">{{label}}</h6>
+                <ul class="byblos-docs-navlist">
+                    {{#items}}
+                    <li>
+                        <a href="{{{url}}}" class="byblos-docs-navlink {{#active}}active{{/active}}">{{title}}</a>
+                    </li>
+                    {{/items}}
+                </ul>
+            </div>
+            {{/navgroups}}
+        </aside>
+
+        <main class="byblos-docs-content">
+            {{{content}}}
+
+            <nav class="byblos-docs-pager">
+                <div class="byblos-docs-pager-prev">
+                    {{#hasprev}}
+                    <a href="{{{prev.url}}}" class="byblos-docs-pagerlink">
+                        <span class="byblos-docs-pager-dir"><i class="fa fa-arrow-left"></i> {{#str}}docs_prev, local_byblos{{/str}}</span>
+                        <span class="byblos-docs-pager-title">{{prev.title}}</span>
+                    </a>
+                    {{/hasprev}}
+                </div>
+                <div class="byblos-docs-pager-next">
+                    {{#hasnext}}
+                    <a href="{{{next.url}}}" class="byblos-docs-pagerlink text-right">
+                        <span class="byblos-docs-pager-dir">{{#str}}docs_next, local_byblos{{/str}} <i class="fa fa-arrow-right"></i></span>
+                        <span class="byblos-docs-pager-title">{{next.title}}</span>
+                    </a>
+                    {{/hasnext}}
+                </div>
+            </nav>
+        </main>
+    </div>
+</div>
