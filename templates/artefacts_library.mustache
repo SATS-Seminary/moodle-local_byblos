@@ -1,0 +1,184 @@
+{{!
+    @template local_byblos/artefacts_library
+
+    The artefact library body: instant search, sort, group, grid/list density
+    toggle, type filter (auto-imported types folded into one "Imported" pill) and
+    tag filter. All filtering runs client-side via local_byblos/artefacts. Hosted
+    by the dashboard "My Artefacts" tab; the host supplies its own heading.
+
+    @package    local_byblos
+    @copyright  2026 South African Theological Seminary
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+Example context (json):
+    {
+        "has_artefacts": true,
+        "hastags": true,
+        "newartefacturl": "#",
+        "typefilters": [
+            {"value": "", "label": "All", "active": true},
+            {"value": "image", "label": "Image", "active": false}
+        ],
+        "tagfilters": [
+            {"value": "year-1", "label": "year-1"}
+        ],
+        "artefacts": [
+            {
+                "id": 1,
+                "title": "Reflection photo",
+                "type": "image",
+                "typelabel": "Image",
+                "faicon": "fa-file-image-o",
+                "isimage": true,
+                "thumburl": "#",
+                "imported": false,
+                "description": "<p>A photo.</p>",
+                "hastags": true,
+                "tags": [{"name": "year-1", "url": "#"}],
+                "tagnames": "year-1",
+                "searchblob": "reflection photo image year-1",
+                "titlesort": "reflection photo",
+                "timesort": 1700000000,
+                "viewurl": "#",
+                "editurl": "#",
+                "deleteurl": "#",
+                "timecreated": "12 May 2026"
+            }
+        ],
+        "sesskey": "abc123"
+    }
+}}
+<div class="byblos-artefacts-list" data-region="byblos-artefacts">
+    {{#has_artefacts}}
+    {{! Toolbar: search, sort, group, density toggle }}
+    <div class="byblos-artefacts-toolbar d-flex flex-wrap align-items-center mb-3">
+        <div class="byblos-toolbar-search input-group input-group-sm mr-2 mb-2">
+            <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-search"></i></span>
+            </div>
+            <input type="text" class="form-control" data-action="search"
+                   aria-label="{{#str}}searchartefacts, local_byblos{{/str}}"
+                   placeholder="{{#str}}searchartefacts, local_byblos{{/str}}">
+        </div>
+
+        <label class="sr-only" for="byblos-artefact-sort">{{#str}}sortby, local_byblos{{/str}}</label>
+        <select id="byblos-artefact-sort" class="custom-select custom-select-sm w-auto mr-2 mb-2" data-action="sort">
+            <option value="newest">{{#str}}sort_newest, local_byblos{{/str}}</option>
+            <option value="oldest">{{#str}}sort_oldest, local_byblos{{/str}}</option>
+            <option value="title_az">{{#str}}sort_title_az, local_byblos{{/str}}</option>
+            <option value="title_za">{{#str}}sort_title_za, local_byblos{{/str}}</option>
+            <option value="type">{{#str}}sort_type, local_byblos{{/str}}</option>
+        </select>
+
+        <label class="sr-only" for="byblos-artefact-group">{{#str}}groupby, local_byblos{{/str}}</label>
+        <select id="byblos-artefact-group" class="custom-select custom-select-sm w-auto mr-2 mb-2" data-action="group">
+            <option value="none">{{#str}}group_none, local_byblos{{/str}}</option>
+            <option value="type">{{#str}}group_type, local_byblos{{/str}}</option>
+        </select>
+
+        <div class="btn-group btn-group-sm mb-2" role="group" aria-label="{{#str}}viewmode, local_byblos{{/str}}">
+            <button type="button" class="btn btn-outline-secondary active" data-action="view" data-view="grid"
+                    aria-label="{{#str}}view_grid, local_byblos{{/str}}" title="{{#str}}view_grid, local_byblos{{/str}}">
+                <i class="fa fa-th"></i>
+            </button>
+            <button type="button" class="btn btn-outline-secondary" data-action="view" data-view="list"
+                    aria-label="{{#str}}view_list, local_byblos{{/str}}" title="{{#str}}view_list, local_byblos{{/str}}">
+                <i class="fa fa-list"></i>
+            </button>
+        </div>
+    </div>
+
+    {{! Type filter pills }}
+    <ul class="nav nav-pills byblos-typefilters mb-2">
+        {{#typefilters}}
+        <li class="nav-item">
+            <button type="button" class="nav-link {{#active}}active{{/active}}" data-filtertype="{{value}}">{{label}}</button>
+        </li>
+        {{/typefilters}}
+    </ul>
+
+    {{#hastags}}
+    {{! Tag filter chips }}
+    <div class="byblos-tagfilters mb-3" data-region="tagfilters">
+        <span class="byblos-tagfilters-label text-muted small mr-1"><i class="fa fa-tags"></i> {{#str}}filterbytag, local_byblos{{/str}}</span>
+        {{#tagfilters}}
+        <button type="button" class="badge badge-pill badge-light byblos-tagfilter" data-filtertag="{{value}}">{{label}}</button>
+        {{/tagfilters}}
+        <button type="button" class="badge badge-pill byblos-tagfilter-clear d-none" data-action="cleartags">
+            <i class="fa fa-times"></i> {{#str}}cleartags, local_byblos{{/str}}
+        </button>
+    </div>
+    {{/hastags}}
+
+    <p class="text-muted small byblos-artefact-count mb-2" data-region="count"
+       data-tpl="{{#str}}showingcount, local_byblos{{/str}}" aria-live="polite"></p>
+
+    {{! Items (CSS grid; list view is the same DOM with a density class) }}
+    <div class="byblos-artefacts-items byblos-view-grid" data-region="items">
+        {{#artefacts}}
+        <div class="byblos-artefact-item" data-region="artefact"
+             data-type="{{type}}"
+             data-imported="{{#imported}}1{{/imported}}{{^imported}}0{{/imported}}"
+             data-tags="{{tagnames}}"
+             data-search="{{searchblob}}"
+             data-title="{{titlesort}}"
+             data-time="{{timesort}}"
+             data-typelabel="{{typelabel}}">
+            <div class="byblos-artefact-card card h-100">
+                <a href="{{{viewurl}}}" class="byblos-artefact-thumb byblos-thumb-{{type}}" tabindex="-1" aria-hidden="true">
+                    {{#isimage}}
+                    <img src="{{{thumburl}}}" alt="" class="byblos-thumb-img" loading="lazy">
+                    {{/isimage}}
+                    {{^isimage}}
+                    <span class="byblos-thumb-icon"><i class="fa {{faicon}}"></i></span>
+                    {{/isimage}}
+                </a>
+                <div class="card-body">
+                    <h5 class="card-title mb-1">
+                        <a href="{{{viewurl}}}">{{title}}</a>
+                    </h5>
+                    <span class="badge badge-info byblos-artefact-typebadge">
+                        <i class="fa {{faicon}}"></i> {{typelabel}}
+                    </span>
+                    {{#hastags}}
+                    <div class="byblos-artefact-tags mt-1">
+                        {{#tags}}
+                        <a href="{{{url}}}" class="badge badge-light byblos-tag-chip"><i class="fa fa-tag"></i> {{name}}</a>
+                        {{/tags}}
+                    </div>
+                    {{/hastags}}
+                    <p class="card-text text-muted small byblos-artefact-desc mt-2">{{{description}}}</p>
+                </div>
+                <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
+                    <small class="text-muted">{{timecreated}}</small>
+                    <div class="byblos-artefact-actions">
+                        <a href="{{{editurl}}}" class="btn btn-sm btn-outline-primary" aria-label="{{#str}}edit{{/str}}">
+                            <i class="fa fa-pencil"></i>
+                        </a>
+                        <form method="post" action="{{{deleteurl}}}" class="d-inline"
+                              data-byblos-confirm="{{#str}}confirmdeleteartefact, local_byblos{{/str}}">
+                            <input type="hidden" name="sesskey" value="{{sesskey}}">
+                            <input type="hidden" name="action" value="artefact">
+                            <input type="hidden" name="id" value="{{id}}">
+                            <button type="submit" class="btn btn-sm btn-outline-danger" aria-label="{{#str}}delete{{/str}}">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{/artefacts}}
+    </div>
+
+    <div class="alert alert-info byblos-artefacts-noresults d-none" data-region="noresults">
+        {{#str}}noartefactsmatch, local_byblos{{/str}}
+    </div>
+    {{/has_artefacts}}
+
+    {{^has_artefacts}}
+    <div class="alert alert-info">
+        {{#str}}noartefacts, local_byblos{{/str}}
+        <a href="{{{newartefacturl}}}">{{#str}}newartefact, local_byblos{{/str}}</a>
+    </div>
+    {{/has_artefacts}}
+</div>

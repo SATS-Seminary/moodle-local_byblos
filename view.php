@@ -30,6 +30,7 @@ use local_byblos\page;
 use local_byblos\collection;
 use local_byblos\artefact;
 use local_byblos\goal;
+use local_byblos\share;
 use local_byblos\peer as byblos_peer;
 use local_byblos\submission as byblos_submission;
 
@@ -45,7 +46,9 @@ $PAGE->add_body_class('byblos-body');
 $PAGE->add_body_class('byblos-body-dashboard');
 $PAGE->set_pagelayout('standard');
 
-$tab = optional_param('tab', 'pages', PARAM_ALPHA);
+// Default landing tab follows the documented best-practice workflow: set goals,
+// then curate artefacts, then build pages. So the dashboard opens on Goals.
+$tab = optional_param('tab', 'goals', PARAM_ALPHA);
 $filterassignmentid = optional_param('assignmentid', 0, PARAM_INT);
 
 // Handle new collection creation (POST).
@@ -126,21 +129,9 @@ foreach ($collections as $c) {
     ];
 }
 
-$artefacts = artefact::list_by_user($USER->id);
-$artdata = [];
-foreach ($artefacts as $a) {
-    $artdata[] = [
-        'id'          => $a->id,
-        'title'       => format_string($a->title, true, ['escape' => false]),
-        'type'        => $a->artefacttype,
-        'typelabel'   => get_string('artefacttype_' . $a->artefacttype, 'local_byblos'),
-        'description' => format_text($a->description, FORMAT_HTML),
-        'viewurl'     => (new moodle_url('/local/byblos/artefact.php', ['id' => $a->id]))->out(false),
-        'editurl'     => (new moodle_url('/local/byblos/artefact.php', ['id' => $a->id, 'action' => 'edit']))->out(false),
-        'deleteurl'   => (new moodle_url('/local/byblos/delete.php'))->out(false),
-        'timecreated' => userdate($a->timecreated),
-    ];
-}
+// The "My Artefacts" tab is the full library: enriched cards plus the type and
+// tag filter sets, all driven client-side by the local_byblos/artefacts module.
+$librarydata = \local_byblos\artefact_library::data((int) $USER->id);
 
 // Learning goals for the current user (self-regulated-learning loop).
 $goals = goal::list_by_user((int) $USER->id);
@@ -230,12 +221,44 @@ if ($usergroupids) {
     }
 }
 
+// Items other people have shared with this user (the "Shared with me" tab).
+$shared = share::list_shared_with_user((int) $USER->id);
+$sharedpagecards = [];
+foreach ($shared['pages'] as $sp) {
+    $owner = $DB->get_record('user', ['id' => $sp->userid], 'id, firstname, lastname');
+    $sharedpagecards[] = [
+        'title'       => format_string($sp->title),
+        'description' => shorten_text(strip_tags($sp->description ?? ''), 120),
+        'owner'       => $owner ? fullname($owner) : '',
+        'status'      => $sp->status,
+        'viewurl'     => (new moodle_url('/local/byblos/page.php', ['id' => $sp->id]))->out(false),
+        'timecreated' => userdate($sp->timecreated),
+    ];
+}
+$sharedcollectioncards = [];
+foreach ($shared['collections'] as $sc) {
+    $owner = $DB->get_record('user', ['id' => $sc->userid], 'id, firstname, lastname');
+    $sharedcollectioncards[] = [
+        'title'       => format_string($sc->title),
+        'description' => shorten_text(strip_tags($sc->description ?? ''), 120),
+        'owner'       => $owner ? fullname($owner) : '',
+        'viewurl'     => (new moodle_url('/local/byblos/collection.php', ['id' => $sc->id]))->out(false),
+        'timecreated' => userdate($sc->timecreated),
+    ];
+}
+
 $data = [
     'tab_pages'       => ($tab === 'pages'),
     'tab_collections' => ($tab === 'collections'),
     'tab_artefacts'   => ($tab === 'artefacts'),
     'tab_goals'       => ($tab === 'goals'),
     'tab_reviews'     => ($tab === 'reviews'),
+    'tab_shared'      => ($tab === 'shared'),
+    'sharedpages'           => $sharedpagecards,
+    'has_sharedpages'       => !empty($sharedpagecards),
+    'sharedcollections'     => $sharedcollectioncards,
+    'has_sharedcollections' => !empty($sharedcollectioncards),
+    'has_shared'            => !empty($sharedpagecards) || !empty($sharedcollectioncards),
     'reviews'         => $reviewdata,
     'has_reviews'     => !empty($reviewdata),
     'goals'           => $goaldata,
@@ -248,8 +271,11 @@ $data = [
     'has_collections' => !empty($coldata),
     'usergroups'      => $usergroupsdata,
     'has_usergroups'  => !empty($usergroupsdata),
-    'artefacts'       => $artdata,
-    'has_artefacts'   => !empty($artdata),
+    'artefacts'       => $librarydata['artefacts'],
+    'has_artefacts'   => $librarydata['has_artefacts'],
+    'typefilters'     => $librarydata['typefilters'],
+    'tagfilters'      => $librarydata['tagfilters'],
+    'hastags'         => $librarydata['hastags'],
     'newpageurl'      => (new moodle_url('/local/byblos/newpage.php'))->out(false),
     'newartefacturl'  => (new moodle_url('/local/byblos/artefact.php', ['action' => 'edit']))->out(false),
     'actionurl'       => (new moodle_url('/local/byblos/view.php', ['tab' => 'collections']))->out(false),
@@ -265,6 +291,7 @@ $PAGE->requires->js_call_amd('local_byblos/goals', 'init', [[
     'templates' => $goaltemplates,
 ]]);
 $PAGE->requires->js_call_amd('local_byblos/confirm', 'init');
+$PAGE->requires->js_call_amd('local_byblos/artefacts', 'init');
 
 echo $OUTPUT->header();
 echo $OUTPUT->render_from_template('local_byblos/dashboard', $data);

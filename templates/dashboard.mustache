@@ -97,6 +97,16 @@ Example context (json):
 
     <ul class="nav nav-tabs mb-4" role="tablist">
         <li class="nav-item">
+            <a class="nav-link {{#tab_goals}}active{{/tab_goals}}" data-bs-toggle="tab" href="#byblos-tab-goals" role="tab">
+                <i class="fa fa-bullseye"></i> {{#str}}tab_goals, local_byblos{{/str}}
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{#tab_artefacts}}active{{/tab_artefacts}}" data-bs-toggle="tab" href="#byblos-tab-artefacts" role="tab">
+                <i class="fa fa-puzzle-piece"></i> {{#str}}tab_artefacts, local_byblos{{/str}}
+            </a>
+        </li>
+        <li class="nav-item">
             <a class="nav-link {{#tab_pages}}active{{/tab_pages}}" data-bs-toggle="tab" href="#byblos-tab-pages" role="tab">
                 <i class="fa fa-file-text-o"></i> {{#str}}tab_pages, local_byblos{{/str}}
             </a>
@@ -107,18 +117,13 @@ Example context (json):
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {{#tab_artefacts}}active{{/tab_artefacts}}" data-bs-toggle="tab" href="#byblos-tab-artefacts" role="tab">
-                <i class="fa fa-puzzle-piece"></i> {{#str}}tab_artefacts, local_byblos{{/str}}
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link {{#tab_goals}}active{{/tab_goals}}" data-bs-toggle="tab" href="#byblos-tab-goals" role="tab">
-                <i class="fa fa-bullseye"></i> {{#str}}tab_goals, local_byblos{{/str}}
-            </a>
-        </li>
-        <li class="nav-item">
             <a class="nav-link {{#tab_reviews}}active{{/tab_reviews}}" data-bs-toggle="tab" href="#byblos-tab-reviews" role="tab">
                 <i class="fa fa-comments-o"></i> {{#str}}tab_reviews, local_byblos{{/str}}
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{#tab_shared}}active{{/tab_shared}}" data-bs-toggle="tab" href="#byblos-tab-shared" role="tab">
+                <i class="fa fa-share-alt"></i> {{#str}}nav_shared, local_byblos{{/str}}
             </a>
         </li>
     </ul>
@@ -280,46 +285,7 @@ Example context (json):
                     <i class="fa fa-plus"></i> {{#str}}newartefact, local_byblos{{/str}}
                 </a>
             </div>
-            {{#has_artefacts}}
-            <div class="row">
-                {{#artefacts}}
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                <a href="{{{viewurl}}}">{{title}}</a>
-                            </h5>
-                            <span class="badge badge-info">{{typelabel}}</span>
-                            <p class="card-text text-muted small mt-2">{{{description}}}</p>
-                        </div>
-                        <div class="card-footer bg-transparent">
-                            <small class="text-muted">{{timecreated}}</small>
-                            <div class="float-right">
-                                <a href="{{{editurl}}}" class="btn btn-sm btn-outline-primary">
-                                    <i class="fa fa-pencil"></i>
-                                </a>
-                                <form method="post" action="{{{deleteurl}}}" class="d-inline"
-                                      data-byblos-confirm="{{#str}}confirmdeleteartefact, local_byblos{{/str}}">
-                                    <input type="hidden" name="sesskey" value="{{sesskey}}">
-                                    <input type="hidden" name="action" value="artefact">
-                                    <input type="hidden" name="id" value="{{id}}">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">
-                                        <i class="fa fa-trash"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {{/artefacts}}
-            </div>
-            {{/has_artefacts}}
-            {{^has_artefacts}}
-            <div class="alert alert-info">
-                {{#str}}noartefacts, local_byblos{{/str}}
-                <a href="{{{newartefacturl}}}">{{#str}}newartefact, local_byblos{{/str}}</a>
-            </div>
-            {{/has_artefacts}}
+            {{> local_byblos/artefacts_library }}
         </div>
 
         {{! ---- My Goals Tab ---- }}
@@ -464,6 +430,62 @@ Example context (json):
                 {{#str}}reviews_empty, local_byblos{{/str}}
             </div>
             {{/has_reviews}}
+        </div>
+
+        {{! ---- Shared with me Tab ---- }}
+        <div class="tab-pane fade {{#tab_shared}}show active{{/tab_shared}}" id="byblos-tab-shared" role="tabpanel">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4>{{#str}}nav_shared, local_byblos{{/str}}</h4>
+            </div>
+            {{#has_sharedpages}}
+            <h5 class="mb-3">{{#str}}nav_pages, local_byblos{{/str}}</h5>
+            <div class="row mb-2">
+                {{#sharedpages}}
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title"><a href="{{{viewurl}}}">{{title}}</a></h5>
+                            {{#description}}<p class="card-text text-muted small">{{description}}</p>{{/description}}
+                            <p class="card-text mb-0"><small class="text-muted"><i class="fa fa-user"></i> {{owner}}</small></p>
+                        </div>
+                        <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
+                            <small class="text-muted">{{timecreated}}</small>
+                            <a href="{{{viewurl}}}" class="btn btn-sm btn-outline-primary">
+                                <i class="fa fa-eye"></i> {{#str}}action_preview, local_byblos{{/str}}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {{/sharedpages}}
+            </div>
+            {{/has_sharedpages}}
+            {{#has_sharedcollections}}
+            <h5 class="mb-3">{{#str}}nav_collections, local_byblos{{/str}}</h5>
+            <div class="row mb-2">
+                {{#sharedcollections}}
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title"><a href="{{{viewurl}}}">{{title}}</a></h5>
+                            {{#description}}<p class="card-text text-muted small">{{description}}</p>{{/description}}
+                            <p class="card-text mb-0"><small class="text-muted"><i class="fa fa-user"></i> {{owner}}</small></p>
+                        </div>
+                        <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
+                            <small class="text-muted">{{timecreated}}</small>
+                            <a href="{{{viewurl}}}" class="btn btn-sm btn-outline-primary">
+                                <i class="fa fa-eye"></i> {{#str}}action_preview, local_byblos{{/str}}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {{/sharedcollections}}
+            </div>
+            {{/has_sharedcollections}}
+            {{^has_shared}}
+            <div class="alert alert-info">
+                {{#str}}no_results, local_byblos{{/str}}
+            </div>
+            {{/has_shared}}
         </div>
 
     </div>

@@ -110,6 +110,9 @@ class artefact {
     public static function delete(int $id): bool {
         global $DB;
 
+        // Remove any tag instances attached to this artefact (core_tag area).
+        \core_tag_tag::remove_all_item_tags('local_byblos', 'local_byblos_artefact', $id);
+
         return $DB->delete_records(self::TABLE, ['id' => $id]);
     }
 

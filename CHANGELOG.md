@@ -5,6 +5,72 @@ All notable changes to the βyblos ePortfolio plugin will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-06-09
+
+A curation-and-sharing release. The artefact library becomes searchable and
+taggable and moves onto the dashboard, sections gain column layouts, the
+dashboard is reordered to match the documented workflow, the share dialog is
+scoped so it no longer lists thousands of people, and recipients now find out
+when something is shared with them (schema version `2026060907`).
+
+### Added
+
+#### Artefact library and tagging
+- The **My Artefacts** dashboard tab is now a real library: instant search,
+  sort (newest, oldest, title, type), group by type, and a remembered grid or
+  list density toggle, all running client-side over the loaded set with no page
+  reloads.
+- **Recognition at a glance**: image artefacts show a thumbnail and every other
+  type shows a large tinted icon. The type filter pills list only the types you
+  actually have, with the auto-imported types (badges, course completions, blog
+  entries) folded behind a single "Imported" filter.
+- **Tagging**, built on Moodle's core tag system: add free or standard tags to
+  any artefact (with autocomplete), filter the library by tag, and follow a tag
+  to a standard Moodle tag page. Those tag pages are owner-scoped, so they never
+  expose another learner's artefacts. Core-tag privacy metadata is declared.
+
+#### Per-section column layout
+- Each page section can be set to **Full width, Half, or One third** in its
+  editor. On the published page, sections flow into a responsive grid (two
+  halves sit side by side, thirds line up three across) and stack on small
+  screens. Adds a `width` column to `local_byblos_section`; existing sections
+  default to full width.
+
+#### Sharing
+- A **Shared with me** dashboard tab lists the pages and collections other
+  people have shared with you.
+- **Notifications**: when a page is shared with you directly (a user share) you
+  now receive a Moodle notification (popup and/or email, per your message
+  preferences) linking straight to the page. Adds a `pageshared` message
+  provider. Course, group and public shares send no per-user notification.
+
+### Changed
+- **Dashboard tabs follow the documented best-practice workflow**: Goals, My
+  Artefacts, Pages, Collections, Reviews, and the dashboard now opens on Goals
+  (set intentions, then curate evidence, then build pages).
+- **Share with a specific user** is now a two-step, course-scoped picker: choose
+  one of your courses, then pick from that course's participants, loaded on
+  demand through a new web service. Previously the dropdown pooled every person
+  across every course you were enrolled in.
+- The per-course **Course Portfolios** link now appears only when that course
+  has portfolio content you can see, rather than in every course.
+- The artefact library and the shared-with-me list moved onto the dashboard; the
+  old standalone `artefacts.php` and `shared.php` URLs now redirect there, and
+  their superseded templates were removed.
+
+### Fixed
+- **Pages shared with a course now appear in that course's Course Portfolios.**
+  The listing previously read only the page-to-course association table and
+  ignored course shares, so shared pages never showed up (and, with the new
+  gating, the link could vanish entirely).
+- **Shared with me no longer shows your own pages.** A page you shared with a
+  course or group you also belong to was bouncing back into your own list.
+
+### Security
+- The share user picker no longer discloses the email address of every person
+  who shares a course with you. It now shows names only, one course at a time,
+  loaded on demand.
+
 ## [1.2.1] - 2026-06-09
 
 Security patch closing a stored cross-site scripting hole in shared and public

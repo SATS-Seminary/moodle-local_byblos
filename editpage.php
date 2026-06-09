@@ -73,6 +73,7 @@ foreach ($sections as $idx => $sec) {
         'sortorder'   => (int) $sec->sortorder,
         'configdata'  => $sec->configdata ?? '{}',
         'content'     => $sec->content ?? '',
+        'width'       => $sec->width ?? 'full',
         'rendered'    => $rendered,
     ];
 }

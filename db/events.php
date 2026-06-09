@@ -32,4 +32,10 @@ $observers = [
         'callback'  => '\local_byblos\completion\byblos_completion::page_created_handler',
     ],
 
+    // Notify a user when a portfolio page is shared directly with them.
+    [
+        'eventname' => '\local_byblos\event\page_shared',
+        'callback'  => '\local_byblos\observer::page_shared',
+    ],
+
 ];

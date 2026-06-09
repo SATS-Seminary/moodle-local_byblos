@@ -14,17 +14,15 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Share page — swap the sharevalue picker to match the selected sharetype.
- *
- * Only the picker matching the current sharetype is named "sharevalue" and
- * enabled; the others are hidden and disabled so the form posts a single
- * consistent value. Public type submits no sharevalue.
+ * Share page behaviour: swap the value picker to match the selected share type,
+ * and load the "share with a person" list one course at a time (a teacher can
+ * otherwise be enrolled with thousands of people).
  *
  * @module     local_byblos/share
  * @copyright  2026 South African Theological Seminary
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-define([], function() {
+define(['core/ajax'], function(Ajax) {
     'use strict';
 
     /**
@@ -48,6 +46,62 @@ define([], function() {
                 select.removeAttribute('name');
                 select.disabled = true;
             }
+        });
+    }
+
+    /**
+     * Build an option element.
+     *
+     * @param {string|number} value Option value.
+     * @param {string} text Visible label.
+     * @param {boolean} disabled Whether the option is selectable.
+     * @return {HTMLOptionElement} The option.
+     */
+    function makeOption(value, text, disabled) {
+        var opt = document.createElement('option');
+        opt.value = value;
+        opt.textContent = text;
+        if (disabled) {
+            opt.disabled = true;
+        }
+        return opt;
+    }
+
+    /**
+     * Load the chosen course's participants into the person picker on demand.
+     *
+     * @param {string} courseid Selected course id (empty clears the list).
+     * @param {HTMLSelectElement} personSelect The person select to fill.
+     * @param {Array} sharedUsers User ids already shared with (shown disabled).
+     * @param {Object} strings Localised labels.
+     */
+    function loadCourseUsers(courseid, personSelect, sharedUsers, strings) {
+        personSelect.innerHTML = '';
+        if (!courseid) {
+            personSelect.appendChild(makeOption('', strings.pickperson || '', false));
+            return;
+        }
+        personSelect.appendChild(makeOption('', strings.loading || '', true));
+
+        Ajax.call([{
+            methodname: 'local_byblos_get_course_users',
+            args: {courseid: parseInt(courseid, 10)}
+        }])[0].then(function(users) {
+            personSelect.innerHTML = '';
+            if (!users || !users.length) {
+                personSelect.appendChild(makeOption('', strings.noneincourse || '', true));
+                return users;
+            }
+            personSelect.appendChild(makeOption('', strings.pickperson || '', false));
+            users.forEach(function(u) {
+                var already = sharedUsers.indexOf(u.id) !== -1;
+                var label = u.label + (already ? ' — ' + (strings.alreadyshared || '') : '');
+                personSelect.appendChild(makeOption(u.id, label, already));
+            });
+            return users;
+        }).catch(function() {
+            personSelect.innerHTML = '';
+            personSelect.appendChild(makeOption('', strings.noneincourse || '', true));
         });
     }
 
@@ -78,13 +132,31 @@ define([], function() {
     }
 
     return {
-        init: function() {
+        /**
+         * Initialise the share page.
+         *
+         * @param {Object} args Object with sharedusers (number[]) and strings (Object).
+         */
+        init: function(args) {
+            args = args || {};
+            var sharedUsers = args.sharedusers || [];
+            var strings = args.strings || {};
+
             // Copy-to-clipboard for public share links.
             document.querySelectorAll('.byblos-share-copy').forEach(function(btn) {
                 btn.addEventListener('click', function() {
                     copyFrom(btn);
                 });
             });
+
+            // User cascade: pick a course, then load only that course's people.
+            var courseSelect = document.getElementById('byblos-share-user-course');
+            var personSelect = document.getElementById('byblos-sharevalue-user');
+            if (courseSelect && personSelect) {
+                courseSelect.addEventListener('change', function() {
+                    loadCourseUsers(courseSelect.value, personSelect, sharedUsers, strings);
+                });
+            }
 
             // Share-type picker: swap the value control to match the selected type.
             var typeSelect = document.getElementById('byblos-sharetype');

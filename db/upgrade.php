@@ -259,5 +259,16 @@ function xmldb_local_byblos_upgrade(int $oldversion): bool {
         upgrade_plugin_savepoint(true, 2026060702, 'local', 'byblos');
     }
 
+    if ($oldversion < 2026060904) {
+        // Per-section column width (full / half / third) for page layout.
+        $table = new xmldb_table('local_byblos_section');
+        $field = new xmldb_field('width', XMLDB_TYPE_CHAR, '16', null, XMLDB_NOTNULL, null, 'full', 'content');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2026060904, 'local', 'byblos');
+    }
+
     return true;
 }

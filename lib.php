@@ -64,12 +64,39 @@ function local_byblos_extend_navigation(global_navigation $nav): void {
  * @return void
  */
 function local_byblos_extend_navigation_course(navigation_node $nav, stdClass $course, context_course $context): void {
+    global $USER;
+
     if (!get_config('local_byblos', 'enabled')) {
         return;
     }
 
-    if (!has_capability('local/byblos:use', context_system::instance())) {
+    $systemcontext = context_system::instance();
+    if (!has_capability('local/byblos:use', $systemcontext)) {
         return;
+    }
+
+    // Only surface the link when there is something to show, otherwise it is just
+    // clutter in every course. This mirrors the visibility rules in
+    // courseportfolios.php: a reviewer (viewshared) needs any page linked to the
+    // course; a learner needs a page they own or one shared with them.
+    $pages = \local_byblos\page::get_pages_for_course((int) $course->id);
+    if (empty($pages)) {
+        return;
+    }
+    if (!has_capability('local/byblos:viewshared', $systemcontext)) {
+        $hasvisible = false;
+        foreach ($pages as $p) {
+            if (
+                (int) $p->userid === (int) $USER->id
+                    || \local_byblos\share::can_view_page((int) $USER->id, (int) $p->id)
+            ) {
+                $hasvisible = true;
+                break;
+            }
+        }
+        if (!$hasvisible) {
+            return;
+        }
     }
 
     $nav->add(
@@ -473,4 +500,87 @@ function local_byblos_output_fragment_reflection_editor(array $args): string {
     ]);
 
     return $mform->render();
+}
+
+/**
+ * Tag-area callback: return this user's own artefacts carrying a given tag.
+ *
+ * Powers Moodle's core tag pages (/tag/index.php) for the
+ * local_byblos/local_byblos_artefact area. Artefacts are private to their
+ * owner, so the query is always scoped to the current user: a tag page can
+ * never surface another learner's artefacts, regardless of the context passed.
+ *
+ * @param \core_tag_tag $tag           The tag being viewed.
+ * @param bool          $exclusivemode Whether only this area's items are shown.
+ * @param int           $fromctx       Origin context (unused; artefacts are not course-scoped).
+ * @param int           $ctx           Context filter (unused; owner scoping supersedes it).
+ * @param bool          $rec           Whether to recurse into subcontexts (unused).
+ * @param int           $page          Zero-based page number.
+ * @return \core_tag\output\tagindex|null Rendered tag index, or null when empty.
+ */
+function local_byblos_get_tagged_artefacts(
+    $tag,
+    $exclusivemode = false,
+    $fromctx = 0,
+    $ctx = 0,
+    $rec = true,
+    $page = 0
+) {
+    global $DB, $USER, $OUTPUT;
+
+    $perpage = $exclusivemode ? 20 : 5;
+
+    // Owner-scoped: a learner only ever sees their own artefacts on a tag page.
+    $sql = "SELECT a.id, a.title, a.artefacttype
+              FROM {local_byblos_artefact} a
+              JOIN {tag_instance} tt ON tt.itemid = a.id
+             WHERE tt.itemtype = :itemtype
+               AND tt.component = :component
+               AND tt.tagid = :tagid
+               AND a.userid = :userid
+          ORDER BY a.timemodified DESC, a.id DESC";
+    $params = [
+        'itemtype'  => 'local_byblos_artefact',
+        'component' => 'local_byblos',
+        'tagid'     => $tag->id,
+        'userid'    => $USER->id,
+    ];
+
+    $totalpages = $page + 1;
+    $records = $DB->get_records_sql($sql, $params, $page * $perpage, $perpage + 1);
+    if (count($records) > $perpage) {
+        $totalpages = $page + 2; // Signal that a next page exists without an exact count.
+        array_pop($records);
+    }
+
+    if (empty($records)) {
+        return null;
+    }
+
+    $systemcontext = context_system::instance();
+    $tagfeed = new \core_tag\output\tagfeed();
+    foreach ($records as $record) {
+        $url = new moodle_url('/local/byblos/artefact.php', ['id' => $record->id]);
+        $name = format_string($record->title, true, ['context' => $systemcontext]);
+        $typelabel = get_string('artefacttype_' . $record->artefacttype, 'local_byblos');
+        $handler = \local_byblos\artefact_type::get($record->artefacttype);
+        $iconname = $handler ? $handler->get_icon() : 'f/unknown';
+        $icon = html_writer::link($url, $OUTPUT->pix_icon($iconname, $typelabel));
+        $tagfeed->add($icon, html_writer::link($url, $name), $typelabel);
+    }
+
+    $content = $OUTPUT->render_from_template('core_tag/tagfeed', $tagfeed->export_for_template($OUTPUT));
+
+    return new \core_tag\output\tagindex(
+        $tag,
+        'local_byblos',
+        'local_byblos_artefact',
+        $content,
+        $exclusivemode,
+        $fromctx,
+        $ctx,
+        $rec,
+        $page,
+        $totalpages
+    );
 }

@@ -200,7 +200,6 @@ foreach ($sharedata as $s) {
 
 $coursepicker = [];
 $grouppicker  = [];
-$userspool    = [];
 foreach ($mycourseobjs as $c) {
     $cid = (int) $c->id;
     if ($cid === SITEID) {
@@ -226,28 +225,10 @@ foreach ($mycourseobjs as $c) {
             'disabled' => !empty($existinggroupids[$gid]),
         ];
     }
-    foreach (get_enrolled_users($ccontext, '', 0, 'u.id, u.firstname, u.lastname, u.email') as $u) {
-        $uid = (int) $u->id;
-        if ($uid === (int) $USER->id || isset($userspool[$uid])) {
-            continue;
-        }
-        $userspool[$uid] = [
-            'id'       => $uid,
-            'label'    => fullname($u) . ' (' . $u->email . ')',
-            'sortkey'  => core_text::strtolower(fullname($u)),
-            'disabled' => !empty($existinguserids[$uid]),
-        ];
-    }
 }
 usort($coursepicker, fn($a, $b) => strnatcasecmp($a['label'], $b['label']));
 $grouppicker = array_values($grouppicker);
 usort($grouppicker, fn($a, $b) => strnatcasecmp($a['label'], $b['label']));
-$userpicker = array_values($userspool);
-usort($userpicker, fn($a, $b) => strcmp($a['sortkey'], $b['sortkey']));
-foreach ($userpicker as &$u) {
-    unset($u['sortkey']);
-}
-unset($u);
 
 $templatedata = [
     'itemtitle'      => $itemtitle,
@@ -263,11 +244,17 @@ $templatedata = [
     'has_courses'    => !empty($coursepicker),
     'groups'         => $grouppicker,
     'has_groups'     => !empty($grouppicker),
-    'users'          => $userpicker,
-    'has_users'      => !empty($userpicker),
 ];
 
-$PAGE->requires->js_call_amd('local_byblos/share', 'init');
+$PAGE->requires->js_call_amd('local_byblos/share', 'init', [[
+    'sharedusers' => array_values(array_map('intval', array_keys($existinguserids))),
+    'strings'     => [
+        'pickperson'    => get_string('share_user_pickperson', 'local_byblos'),
+        'alreadyshared' => get_string('share_already', 'local_byblos'),
+        'noneincourse'  => get_string('share_user_noneincourse', 'local_byblos'),
+        'loading'       => get_string('share_user_loading', 'local_byblos'),
+    ],
+]]);
 $PAGE->requires->js_call_amd('local_byblos/confirm', 'init');
 
 echo $OUTPUT->header();

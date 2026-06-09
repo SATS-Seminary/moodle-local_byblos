@@ -15,18 +15,25 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Legacy entry point. The "Shared with me" view now lives on the portfolio
- * dashboard's "Shared with me" tab, so this URL redirects there (keeps any
- * old links and bookmarks working).
+ * Tag areas defined by local_byblos.
+ *
+ * Registers the artefact table as a taggable area so learners can tag their
+ * artefacts with free or standard tags, reusing Moodle's core tag UI
+ * (autocomplete, tag pages). Tagged-item lookups are owner-scoped by the
+ * callback so a tag page never exposes another user's private artefacts.
  *
  * @package    local_byblos
  * @copyright  2026 South African Theological Seminary
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(__DIR__ . '/../../config.php');
+defined('MOODLE_INTERNAL') || die();
 
-require_login();
-require_capability('local/byblos:use', context_system::instance());
-
-redirect(new moodle_url('/local/byblos/view.php', ['tab' => 'shared']));
+$tagareas = [
+    [
+        'itemtype'     => 'local_byblos_artefact',
+        'component'    => 'local_byblos',
+        'callback'     => 'local_byblos_get_tagged_artefacts',
+        'callbackfile' => '/local/byblos/lib.php',
+    ],
+];

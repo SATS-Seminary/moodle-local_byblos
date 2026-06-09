@@ -130,6 +130,15 @@ if ($action === 'edit') {
             'fileid'       => $fileid,
         ]);
 
+        // Persist tags against the artefact (core_tag handles create/dedupe).
+        \core_tag_tag::set_item_tags(
+            'local_byblos',
+            'local_byblos_artefact',
+            $artefactid,
+            $usercontext,
+            $data->tags ?? []
+        );
+
         redirect(
             new moodle_url('/local/byblos/artefact.php', ['id' => $artefactid]),
             get_string('artefactsaved', 'local_byblos'),
@@ -143,6 +152,11 @@ if ($action === 'edit') {
             $toform['type']        = $artefact->artefacttype;
             $toform['title']       = $artefact->title;
             $toform['description'] = $artefact->description;
+            $toform['tags']        = \core_tag_tag::get_item_tags_array(
+                'local_byblos',
+                'local_byblos_artefact',
+                $id
+            );
         }
 
         $iseditorcontent = $artefact
@@ -196,7 +210,7 @@ if ($action === 'edit') {
 
 // View mode (default).
 if ($id <= 0) {
-    redirect(new moodle_url('/local/byblos/artefacts.php'));
+    redirect(new moodle_url('/local/byblos/view.php', ['tab' => 'artefacts']));
 }
 
 $artefact = artefact_model::get($id);
@@ -212,6 +226,11 @@ $PAGE->set_heading(format_string($artefact->title));
 
 $handler = artefact_type::get($artefact->artefacttype);
 
+$viewtags = [];
+foreach (\core_tag_tag::get_item_tags('local_byblos', 'local_byblos_artefact', $id) as $tag) {
+    $viewtags[] = ['name' => $tag->get_display_name(false), 'url' => $tag->get_view_url()->out(false)];
+}
+
 $data = [
     'artefact' => [
         'id'          => $artefact->id,
@@ -219,6 +238,8 @@ $data = [
         'typelabel'   => $handler ? $handler->get_display_name() : $artefact->artefacttype,
         'description' => format_text($artefact->description ?? '', FORMAT_HTML),
         'timecreated' => userdate($artefact->timecreated),
+        'tags'        => $viewtags,
+        'hastags'     => !empty($viewtags),
     ],
     'rendered'  => $handler
         ? $handler->render($artefact)

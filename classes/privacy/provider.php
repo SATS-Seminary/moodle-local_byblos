@@ -186,6 +186,9 @@ class provider implements
             'privacy:metadata:local_byblos_pagefeedback'
         );
 
+        // Tags applied to artefacts are stored by the core tag subsystem.
+        $collection->link_subsystem('core_tag', 'privacy:metadata:core_tag');
+
         return $collection;
     }
 

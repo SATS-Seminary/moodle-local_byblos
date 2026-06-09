@@ -2587,3 +2587,160 @@ body.byblos-body-embedded .byblos-page-view {
 .byblos-artefact-embed video {
     max-width: 100% !important;
 }
+
+/* Artefact library: toolbar, type/tag filters, grid/list views, tiles, chips. */
+.byblos-artefacts-toolbar {
+    gap: 0 !important;
+}
+.byblos-toolbar-search {
+    flex: 1 1 220px !important;
+    min-width: 180px !important;
+    max-width: 320px !important;
+}
+.byblos-typefilters .nav-link {
+    border: 0 !important;
+    background: none !important;
+    cursor: pointer !important;
+}
+.byblos-typefilters .nav-link.active {
+    background: #1a73e8 !important;
+    color: #fff !important;
+    border-radius: 0.25rem !important;
+}
+.byblos-tagfilters {
+    line-height: 2 !important;
+}
+.byblos-tagfilter {
+    cursor: pointer !important;
+    border: 1px solid #d0d4d9 !important;
+    font-weight: normal !important;
+}
+.byblos-tagfilter.active {
+    background: #1a73e8 !important;
+    border-color: #1a73e8 !important;
+    color: #fff !important;
+}
+.byblos-tagfilter-clear {
+    cursor: pointer !important;
+    background: #f8d7da !important;
+    color: #842029 !important;
+}
+.byblos-tag-chip {
+    font-weight: normal !important;
+    text-decoration: none !important;
+}
+
+/* Grid view: responsive auto-fill columns; the same markup powers list view. */
+.byblos-artefacts-items.byblos-view-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
+    gap: 1rem !important;
+}
+.byblos-artefacts-items.byblos-view-grid .byblos-group-heading {
+    grid-column: 1 / -1 !important;
+}
+.byblos-artefact-card {
+    overflow: hidden !important;
+}
+.byblos-artefact-thumb {
+    display: block !important;
+    height: 140px !important;
+    background: #f3f4f6 !important;
+    overflow: hidden !important;
+}
+.byblos-thumb-img {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+}
+.byblos-thumb-icon {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 100% !important;
+    font-size: 2.75rem !important;
+    color: #9aa0a6 !important;
+}
+.byblos-thumb-video .byblos-thumb-icon {
+    color: #b3261e !important;
+}
+.byblos-thumb-audio .byblos-thumb-icon {
+    color: #1a73e8 !important;
+}
+.byblos-thumb-link .byblos-thumb-icon {
+    color: #188038 !important;
+}
+.byblos-thumb-embed .byblos-thumb-icon {
+    color: #9334e6 !important;
+}
+.byblos-thumb-badge .byblos-thumb-icon {
+    color: #e37400 !important;
+}
+.byblos-artefact-typebadge {
+    font-weight: normal !important;
+}
+.byblos-artefact-desc {
+    max-height: 3em !important;
+    overflow: hidden !important;
+}
+.byblos-group-heading h4 {
+    border-bottom: 1px solid #e9ecef !important;
+    padding-bottom: 0.25rem !important;
+}
+
+/* List view: compact horizontal rows from the same item markup. */
+.byblos-artefacts-items.byblos-view-list .byblos-artefact-item {
+    margin-bottom: 0.5rem !important;
+}
+.byblos-artefacts-items.byblos-view-list .byblos-artefact-card {
+    flex-direction: row !important;
+    align-items: center !important;
+}
+.byblos-artefacts-items.byblos-view-list .byblos-artefact-thumb {
+    flex: 0 0 56px !important;
+    width: 56px !important;
+    height: 56px !important;
+    margin: 0.5rem !important;
+    border-radius: 0.35rem !important;
+}
+.byblos-artefacts-items.byblos-view-list .byblos-thumb-icon {
+    font-size: 1.5rem !important;
+}
+.byblos-artefacts-items.byblos-view-list .card-body {
+    flex: 1 1 auto !important;
+    padding: 0.5rem 0.75rem !important;
+}
+.byblos-artefacts-items.byblos-view-list .byblos-artefact-desc {
+    display: none !important;
+}
+.byblos-artefacts-items.byblos-view-list .card-footer {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    border: 0 !important;
+}
+
+/* Per-section column layout: sections flow into a 12-column responsive grid. */
+/* All-full pages still render one section per row (span 12), as before. */
+.byblos-sections {
+    display: grid !important;
+    grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+    gap: 1.5rem !important;
+    align-items: start !important;
+}
+.byblos-section-w-full {
+    grid-column: span 12 !important;
+}
+.byblos-section-w-half {
+    grid-column: span 6 !important;
+}
+.byblos-section-w-third {
+    grid-column: span 4 !important;
+}
+@media (max-width: 768px) {
+    .byblos-section-w-full,
+    .byblos-section-w-half,
+    .byblos-section-w-third {
+        grid-column: span 12 !important;
+    }
+}

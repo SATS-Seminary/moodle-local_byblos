@@ -2151,7 +2151,20 @@ function($, Ajax, Notification, Str, InlineEditor, Upload, TinyLoader,
             return;
         }
 
+        var sectionWidth = $card.attr('data-width') || 'full';
         var html = buildEditForm(stype, cfg, content);
+        // Common layout control: section column width, applied on the published page.
+        html += '<hr class="my-2">' +
+            '<div class="form-group bse-width-group">' +
+            '<label for="bse_width" class="font-weight-bold">Section width</label>' +
+            '<select id="bse_width" class="form-control form-control-sm" style="max-width:240px;">' +
+            '<option value="full"' + (sectionWidth === 'full' ? ' selected' : '') + '>Full width</option>' +
+            '<option value="half"' + (sectionWidth === 'half' ? ' selected' : '') + '>Half (two per row)</option>' +
+            '<option value="third"' + (sectionWidth === 'third' ? ' selected' : '') + '>One third (three per row)</option>' +
+            '</select>' +
+            '<small class="form-text text-muted">Sections flow into rows on the published page. ' +
+            'The editor keeps them in a single list so they stay easy to edit and reorder.</small>' +
+            '</div>';
         html += '<div class="mt-2">' +
             '<button class="btn btn-primary btn-sm bse-save-section">' +
             '<i class="fa fa-check"></i> Save</button> ' +
@@ -2238,11 +2251,13 @@ function($, Ajax, Notification, Str, InlineEditor, Upload, TinyLoader,
             teardownRichFields();
             var result = collectEditForm(stype, $panel);
             var sectionId = parseInt($card.data('section-id'), 10);
+            var chosenWidth = $panel.find('#bse_width').val() || 'full';
 
             callExternal('local_byblos_update_section', {
                 sectionid: sectionId,
                 configdata: JSON.stringify(result.cfg),
-                content: result.content || ''
+                content: result.content || '',
+                width: chosenWidth
             }).then(function(data) {
                 if (data && data.rendered) {
                     $card.find('.byblos-section-preview').html(data.rendered);
@@ -2254,6 +2269,7 @@ function($, Ajax, Notification, Str, InlineEditor, Upload, TinyLoader,
                 }
                 $card.attr('data-configdata', JSON.stringify(result.cfg));
                 $card.attr('data-content', result.content || '');
+                $card.attr('data-width', chosenWidth);
                 $panel.hide().empty();
                 return;
             }).catch(Notification.exception);

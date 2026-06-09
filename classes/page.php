@@ -202,13 +202,25 @@ class page {
     public static function get_pages_for_course(int $courseid): array {
         global $DB;
 
-        $sql = "SELECT p.*
-                  FROM {" . self::TABLE . "} p
-                  JOIN {" . self::TABLE_COURSE . "} pc ON pc.pageid = p.id
-                 WHERE pc.courseid = :courseid
-              ORDER BY p.title ASC";
+        // A page belongs on a course's portfolio list if it is explicitly
+        // associated with the course (page_course) OR shared with the whole
+        // course (a 'course' share). Gather the distinct page ids from both
+        // sources (a UNION over integer ids is portable across databases),
+        // then load the records.
+        $idsql = "SELECT pc.pageid AS pid
+                    FROM {" . self::TABLE_COURSE . "} pc
+                   WHERE pc.courseid = :cid1
+                   UNION
+                  SELECT s.pageid AS pid
+                    FROM {local_byblos_share} s
+                   WHERE s.sharetype = 'course' AND s.sharevalue = :cid2 AND s.pageid <> 0";
+        $ids = $DB->get_fieldset_sql($idsql, ['cid1' => $courseid, 'cid2' => (string) $courseid]);
+        if (empty($ids)) {
+            return [];
+        }
 
-        return array_values($DB->get_records_sql($sql, ['courseid' => $courseid]));
+        [$insql, $inparams] = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED);
+        return array_values($DB->get_records_select(self::TABLE, "id $insql", $inparams, 'title ASC'));
     }
 
     /**

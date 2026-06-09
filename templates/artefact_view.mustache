@@ -54,6 +54,13 @@ Example context (json):
         <div class="card-body">
             <h2>{{artefact.title}}</h2>
             <span class="badge badge-info">{{artefact.typelabel}}</span>
+            {{#artefact.hastags}}
+            <div class="byblos-artefact-tags mt-2">
+                {{#artefact.tags}}
+                <a href="{{{url}}}" class="badge badge-light byblos-tag-chip"><i class="fa fa-tag"></i> {{name}}</a>
+                {{/artefact.tags}}
+            </div>
+            {{/artefact.hastags}}
             {{#artefact.description}}
             <p class="text-muted mt-2">{{{artefact.description}}}</p>
             {{/artefact.description}}

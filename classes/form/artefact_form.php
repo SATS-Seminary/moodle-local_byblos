@@ -171,6 +171,16 @@ class artefact_form extends \moodleform {
         $mform->hideIf('url', 'type', 'in', ['text', 'audio', 'video', 'image', 'file']);
         $mform->hideIf('url_help', 'type', 'in', ['text', 'audio', 'video', 'image', 'file']);
 
+        // Tags. Reuses Moodle's core tag autocomplete and tag pages so artefacts
+        // can be grouped and found across the library by free or standard tags.
+        $mform->addElement(
+            'tags',
+            'tags',
+            get_string('tags'),
+            ['itemtype' => 'local_byblos_artefact', 'component' => 'local_byblos']
+        );
+        $mform->addElement('static', 'tags_help', '', get_string('artefacttags_help', 'local_byblos'));
+
         $this->add_action_buttons(true, get_string('saveartefact', 'local_byblos'));
     }
 }

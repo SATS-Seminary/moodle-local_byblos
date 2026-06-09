@@ -316,17 +316,25 @@ class share {
             }
         }
 
-        // Load full records.
+        // Load full records, excluding anything the user owns: "shared with me"
+        // means other people's items, not your own pages that you happen to have
+        // shared with a course or group you are also a member of.
         $pages = [];
         if ($pageids) {
             [$insql, $params] = $DB->get_in_or_equal(array_keys($pageids), SQL_PARAMS_NAMED);
-            $pages = array_values($DB->get_records_select('local_byblos_page', "id $insql", $params));
+            $params['owner'] = $userid;
+            $pages = array_values(
+                $DB->get_records_select('local_byblos_page', "id $insql AND userid <> :owner", $params)
+            );
         }
 
         $collections = [];
         if ($collectionids) {
             [$insql, $params] = $DB->get_in_or_equal(array_keys($collectionids), SQL_PARAMS_NAMED);
-            $collections = array_values($DB->get_records_select('local_byblos_collection', "id $insql", $params));
+            $params['owner'] = $userid;
+            $collections = array_values(
+                $DB->get_records_select('local_byblos_collection', "id $insql AND userid <> :owner", $params)
+            );
         }
 
         return [

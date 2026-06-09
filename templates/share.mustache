@@ -141,19 +141,22 @@ Example context (json):
                 </div>
 
                 <div class="form-group byblos-share-picker" data-sharetype="user">
-                    <label>{{# str }} share_user, local_byblos {{/ str }}</label>
-                    {{# has_users }}
-                    <select class="form-control" id="byblos-sharevalue-user" data-name="sharevalue" disabled>
-                        {{# users }}
-                        <option value="{{ id }}" {{# disabled }}disabled{{/ disabled }}>
-                            {{ label }}{{# disabled }} — {{# str }} share_already, local_byblos {{/ str }}{{/ disabled }}
-                        </option>
-                        {{/ users }}
+                    {{# has_courses }}
+                    <label for="byblos-share-user-course">{{# str }} share_user_course, local_byblos {{/ str }}</label>
+                    <select class="form-control mb-2" id="byblos-share-user-course">
+                        <option value="">{{# str }} share_user_pickcourse, local_byblos {{/ str }}</option>
+                        {{# courses }}
+                        <option value="{{ id }}">{{ label }}</option>
+                        {{/ courses }}
                     </select>
-                    {{/ has_users }}
-                    {{^ has_users }}
-                    <div class="alert alert-warning mb-0">{{# str }} share_no_users, local_byblos {{/ str }}</div>
-                    {{/ has_users }}
+                    <label for="byblos-sharevalue-user">{{# str }} share_user, local_byblos {{/ str }}</label>
+                    <select class="form-control" id="byblos-sharevalue-user" data-name="sharevalue" disabled>
+                        <option value="">{{# str }} share_user_pickcourse, local_byblos {{/ str }}</option>
+                    </select>
+                    {{/ has_courses }}
+                    {{^ has_courses }}
+                    <div class="alert alert-warning mb-0">{{# str }} share_no_sharecourses, local_byblos {{/ str }}</div>
+                    {{/ has_courses }}
                 </div>
 
                 <div class="form-group byblos-share-picker d-none" data-sharetype="course">

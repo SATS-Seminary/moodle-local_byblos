@@ -79,7 +79,11 @@ class renderer {
             $hostpageid = (int) ($page->id ?? 0);
             foreach ($sections as $section) {
                 $rendered = self::render_section($section, $page->themekey ?? 'clean', $userid, $hostpageid);
-                $attrs = ['class' => 'byblos-section byblos-section-type-' . s($section->sectiontype)];
+                $width = in_array($section->width ?? 'full', ['full', 'half', 'third'], true)
+                    ? ($section->width ?? 'full')
+                    : 'full';
+                $attrs = ['class' => 'byblos-section byblos-section-w-' . $width
+                    . ' byblos-section-type-' . s($section->sectiontype)];
                 if ($anchor && !empty($section->id)) {
                     $attrs['data-anchor'] = 'section:' . (int) $section->id;
                 }

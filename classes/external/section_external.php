@@ -193,6 +193,7 @@ class section_external extends external_api {
             'sectionid'  => new external_value(PARAM_INT, 'Section ID'),
             'configdata' => new external_value(PARAM_RAW, 'JSON configdata', VALUE_DEFAULT, '{}'),
             'content'    => new external_value(PARAM_RAW, 'Content body', VALUE_DEFAULT, ''),
+            'width'      => new external_value(PARAM_ALPHA, 'Column width: full, half or third', VALUE_DEFAULT, 'full'),
         ]);
     }
 
@@ -204,11 +205,17 @@ class section_external extends external_api {
      * @param string $content
      * @return array{rendered: string}
      */
-    public static function update_section(int $sectionid, string $configdata = '{}', string $content = ''): array {
+    public static function update_section(
+        int $sectionid,
+        string $configdata = '{}',
+        string $content = '',
+        string $width = 'full'
+    ): array {
         $params = self::validate_parameters(self::update_section_parameters(), [
             'sectionid'  => $sectionid,
             'configdata' => $configdata,
             'content'    => $content,
+            'width'      => $width,
         ]);
 
         [$sec, $page] = self::require_section_owner($params['sectionid']);
@@ -219,9 +226,13 @@ class section_external extends external_api {
             throw new \moodle_exception('error:invalidparam', 'local_byblos');
         }
 
+        // Whitelist the layout width; anything unexpected falls back to full.
+        $width = in_array($params['width'], ['full', 'half', 'third'], true) ? $params['width'] : 'full';
+
         section::update((int) $sec->id, [
             'configdata' => $params['configdata'],
             'content'    => $params['content'],
+            'width'      => $width,
         ]);
 
         // Re-fetch to render.

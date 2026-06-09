@@ -35,6 +35,15 @@ $functions = [
         'capabilities' => 'local/byblos:createpage',
     ],
 
+    'local_byblos_get_course_users' => [
+        'classname'    => \local_byblos\external\share_external::class,
+        'methodname'   => 'get_course_users',
+        'description'  => 'List participants of a course the sharer belongs to, for the share dialog.',
+        'type'         => 'read',
+        'ajax'         => true,
+        'capabilities' => 'local/byblos:share',
+    ],
+
     'local_byblos_add_section' => [
         'classname'    => \local_byblos\external\section_external::class,
         'methodname'   => 'add_section',
