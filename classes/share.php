@@ -344,6 +344,36 @@ class share {
     }
 
     /**
+     * List the current user's own pages and collections that carry at least one
+     * share, for the "Shared by me" management view.
+     *
+     * @param int $userid Owner user id.
+     * @return array{pages: \stdClass[], collections: \stdClass[]} Items (id, title, timecreated).
+     */
+    public static function list_owned_shared_items(int $userid): array {
+        global $DB;
+
+        $pages = $DB->get_records_sql(
+            "SELECT DISTINCT p.id, p.title, p.timecreated
+               FROM {local_byblos_page} p
+               JOIN {local_byblos_share} s ON s.pageid = p.id
+              WHERE p.userid = :uid AND s.pageid <> 0
+           ORDER BY p.title ASC",
+            ['uid' => $userid]
+        );
+        $collections = $DB->get_records_sql(
+            "SELECT DISTINCT c.id, c.title, c.timecreated
+               FROM {local_byblos_collection} c
+               JOIN {local_byblos_share} s ON s.collectionid = c.id
+              WHERE c.userid = :uid AND s.collectionid <> 0
+           ORDER BY c.title ASC",
+            ['uid' => $userid]
+        );
+
+        return ['pages' => array_values($pages), 'collections' => array_values($collections)];
+    }
+
+    /**
      * Whether a logged-in user may leave feedback on a page.
      *
      * Requires: feedback enabled on the page, the user can already view the page,

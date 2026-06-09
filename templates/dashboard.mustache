@@ -123,7 +123,7 @@ Example context (json):
         </li>
         <li class="nav-item">
             <a class="nav-link {{#tab_shared}}active{{/tab_shared}}" data-bs-toggle="tab" href="#byblos-tab-shared" role="tab">
-                <i class="fa fa-share-alt"></i> {{#str}}nav_shared, local_byblos{{/str}}
+                <i class="fa fa-share-alt"></i> {{#str}}tab_sharing, local_byblos{{/str}}
             </a>
         </li>
     </ul>
@@ -432,60 +432,100 @@ Example context (json):
             {{/has_reviews}}
         </div>
 
-        {{! ---- Shared with me Tab ---- }}
+        {{! ---- Sharing Tab (Shared with me / Shared by me) ---- }}
         <div class="tab-pane fade {{#tab_shared}}show active{{/tab_shared}}" id="byblos-tab-shared" role="tabpanel">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4>{{#str}}nav_shared, local_byblos{{/str}}</h4>
+                <h4>{{#str}}tab_sharing, local_byblos{{/str}}</h4>
             </div>
-            {{#has_sharedpages}}
-            <h5 class="mb-3">{{#str}}nav_pages, local_byblos{{/str}}</h5>
-            <div class="row mb-2">
-                {{#sharedpages}}
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title"><a href="{{{viewurl}}}">{{title}}</a></h5>
-                            {{#description}}<p class="card-text text-muted small">{{description}}</p>{{/description}}
-                            <p class="card-text mb-0"><small class="text-muted"><i class="fa fa-user"></i> {{owner}}</small></p>
+
+            <ul class="nav nav-pills mb-3" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="pill" href="#byblos-sharing-in" role="tab">
+                        <i class="fa fa-inbox"></i> {{#str}}nav_shared, local_byblos{{/str}}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="pill" href="#byblos-sharing-out" role="tab">
+                        <i class="fa fa-share-square-o"></i> {{#str}}sharing_byme, local_byblos{{/str}}
+                    </a>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                {{! Shared with me (incoming) }}
+                <div class="tab-pane fade show active" id="byblos-sharing-in" role="tabpanel">
+                    {{#has_sharedpages}}
+                    <h5 class="mb-3">{{#str}}nav_pages, local_byblos{{/str}}</h5>
+                    <div class="row mb-2">
+                        {{#sharedpages}}
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title"><a href="{{{viewurl}}}">{{title}}</a></h5>
+                                    {{#description}}<p class="card-text text-muted small">{{description}}</p>{{/description}}
+                                    <p class="card-text mb-0"><small class="text-muted"><i class="fa fa-user"></i> {{owner}}</small></p>
+                                </div>
+                                <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">{{timecreated}}</small>
+                                    <a href="{{{viewurl}}}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fa fa-eye"></i> {{#str}}action_preview, local_byblos{{/str}}
+                                    </a>
+                                </div>
+                            </div>
                         </div>
-                        <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
-                            <small class="text-muted">{{timecreated}}</small>
-                            <a href="{{{viewurl}}}" class="btn btn-sm btn-outline-primary">
-                                <i class="fa fa-eye"></i> {{#str}}action_preview, local_byblos{{/str}}
-                            </a>
-                        </div>
+                        {{/sharedpages}}
                     </div>
-                </div>
-                {{/sharedpages}}
-            </div>
-            {{/has_sharedpages}}
-            {{#has_sharedcollections}}
-            <h5 class="mb-3">{{#str}}nav_collections, local_byblos{{/str}}</h5>
-            <div class="row mb-2">
-                {{#sharedcollections}}
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title"><a href="{{{viewurl}}}">{{title}}</a></h5>
-                            {{#description}}<p class="card-text text-muted small">{{description}}</p>{{/description}}
-                            <p class="card-text mb-0"><small class="text-muted"><i class="fa fa-user"></i> {{owner}}</small></p>
+                    {{/has_sharedpages}}
+                    {{#has_sharedcollections}}
+                    <h5 class="mb-3">{{#str}}nav_collections, local_byblos{{/str}}</h5>
+                    <div class="row mb-2">
+                        {{#sharedcollections}}
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title"><a href="{{{viewurl}}}">{{title}}</a></h5>
+                                    {{#description}}<p class="card-text text-muted small">{{description}}</p>{{/description}}
+                                    <p class="card-text mb-0"><small class="text-muted"><i class="fa fa-user"></i> {{owner}}</small></p>
+                                </div>
+                                <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">{{timecreated}}</small>
+                                    <a href="{{{viewurl}}}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fa fa-eye"></i> {{#str}}action_preview, local_byblos{{/str}}
+                                    </a>
+                                </div>
+                            </div>
                         </div>
-                        <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
-                            <small class="text-muted">{{timecreated}}</small>
-                            <a href="{{{viewurl}}}" class="btn btn-sm btn-outline-primary">
-                                <i class="fa fa-eye"></i> {{#str}}action_preview, local_byblos{{/str}}
-                            </a>
-                        </div>
+                        {{/sharedcollections}}
                     </div>
+                    {{/has_sharedcollections}}
+                    {{^has_shared}}
+                    <div class="alert alert-info">{{#str}}no_results, local_byblos{{/str}}</div>
+                    {{/has_shared}}
                 </div>
-                {{/sharedcollections}}
+
+                {{! Shared by me (outgoing): manage and revoke }}
+                <div class="tab-pane fade" id="byblos-sharing-out" role="tabpanel">
+                    {{#has_sharedbymepages}}
+                    <h5 class="mb-3">{{#str}}nav_pages, local_byblos{{/str}}</h5>
+                    <div class="row mb-2">
+                        {{#sharedbymepages}}
+                        {{> local_byblos/shared_by_item }}
+                        {{/sharedbymepages}}
+                    </div>
+                    {{/has_sharedbymepages}}
+                    {{#has_sharedbymecollections}}
+                    <h5 class="mb-3">{{#str}}nav_collections, local_byblos{{/str}}</h5>
+                    <div class="row mb-2">
+                        {{#sharedbymecollections}}
+                        {{> local_byblos/shared_by_item }}
+                        {{/sharedbymecollections}}
+                    </div>
+                    {{/has_sharedbymecollections}}
+                    {{^has_sharedbyme}}
+                    <div class="alert alert-info">{{#str}}sharedby_none, local_byblos{{/str}}</div>
+                    {{/has_sharedbyme}}
+                </div>
             </div>
-            {{/has_sharedcollections}}
-            {{^has_shared}}
-            <div class="alert alert-info">
-                {{#str}}no_results, local_byblos{{/str}}
-            </div>
-            {{/has_shared}}
         </div>
 
     </div>

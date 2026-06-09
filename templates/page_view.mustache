@@ -97,14 +97,19 @@ Example context (json):
             </a>
         </div>
         {{#isowner}}
-        <div class="btn-group byblos-toolbar">
-            <a href="{{{previewurl}}}" class="btn btn-outline-secondary btn-sm" target="_blank" rel="noopener"
-               title="{{#str}}previewthispage, local_byblos{{/str}}">
-                <i class="fa fa-eye"></i> {{#str}}previewthispage, local_byblos{{/str}}
-            </a>
-            <a href="{{{editurl}}}" class="btn btn-outline-primary btn-sm">
-                <i class="fa fa-pencil"></i> {{#str}}editthispage, local_byblos{{/str}}
-            </a>
+        <div class="byblos-toolbar d-flex flex-wrap align-items-center justify-content-end" style="gap:0.5rem;">
+            {{! Author: view and edit the draft. }}
+            <div class="btn-group btn-group-sm" role="group">
+                <a href="{{{previewurl}}}" class="btn btn-outline-secondary" target="_blank" rel="noopener"
+                   title="{{#str}}previewthispage, local_byblos{{/str}}">
+                    <i class="fa fa-eye"></i> {{#str}}previewthispage, local_byblos{{/str}}
+                </a>
+                <a href="{{{editurl}}}" class="btn btn-outline-secondary">
+                    <i class="fa fa-pencil"></i> {{#str}}editthispage, local_byblos{{/str}}
+                </a>
+            </div>
+
+            {{! The one primary action: publish (only while a draft). }}
             {{#page.is_draft}}
             <form method="post" action="{{{publishurl}}}" class="d-inline"
                   data-byblos-confirm="{{#str}}confirmpublishpage, local_byblos{{/str}}">
@@ -117,38 +122,70 @@ Example context (json):
                 </button>
             </form>
             {{/page.is_draft}}
-            {{^page.is_draft}}
-            <form method="post" action="{{{publishurl}}}" class="d-inline"
-                  data-byblos-confirm="{{#str}}confirmreverttodraft, local_byblos{{/str}}">
-                <input type="hidden" name="sesskey" value="{{sesskey}}">
-                <input type="hidden" name="id" value="{{page.id}}">
-                <input type="hidden" name="action" value="draft">
-                <input type="hidden" name="returnto" value="view">
-                <button type="submit" class="btn btn-outline-warning btn-sm">
-                    <i class="fa fa-undo"></i> {{#str}}reverttodraft, local_byblos{{/str}}
+
+            {{! Distribute: share with people, announcement link, export. }}
+            <div class="btn-group btn-group-sm" role="group">
+                <button type="button" class="btn btn-outline-secondary dropdown-toggle"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fa fa-share-alt"></i> {{#str}}sharethispage, local_byblos{{/str}}
                 </button>
-            </form>
-            {{/page.is_draft}}
-            <a href="{{{shareurl}}}" class="btn btn-outline-success btn-sm">
-                <i class="fa fa-share-alt"></i> {{#str}}sharethispage, local_byblos{{/str}}
-            </a>
-            {{#can_announce}}
-            <button type="button" class="btn btn-outline-success btn-sm" id="byblos-announce-toggle">
-                <i class="fa fa-bullhorn"></i> {{#str}}getannouncementlink, local_byblos{{/str}}
-            </button>
-            {{/can_announce}}
-            <a href="{{{exporturl}}}" class="btn btn-outline-info btn-sm">
-                <i class="fa fa-download"></i> {{#str}}exportthispage, local_byblos{{/str}}
-            </a>
-            <form method="post" action="{{{deleteurl}}}" class="d-inline"
-                  data-byblos-confirm="{{#str}}confirmdeletepage, local_byblos{{/str}}">
-                <input type="hidden" name="sesskey" value="{{sesskey}}">
-                <input type="hidden" name="action" value="page">
-                <input type="hidden" name="id" value="{{page.id}}">
-                <button type="submit" class="btn btn-outline-danger btn-sm">
-                    <i class="fa fa-trash"></i> {{#str}}deletethispage, local_byblos{{/str}}
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li>
+                        <a class="dropdown-item" href="{{{shareurl}}}">
+                            <i class="fa fa-users"></i> {{#str}}share_withpeople, local_byblos{{/str}}
+                        </a>
+                    </li>
+                    {{#can_announce}}
+                    <li>
+                        <button type="button" class="dropdown-item" id="byblos-announce-toggle">
+                            <i class="fa fa-bullhorn"></i> {{#str}}getannouncementlink, local_byblos{{/str}}
+                        </button>
+                    </li>
+                    {{/can_announce}}
+                    <li>
+                        <a class="dropdown-item" href="{{{exporturl}}}">
+                            <i class="fa fa-download"></i> {{#str}}exportthispage, local_byblos{{/str}}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            {{! More: state reversal and the destructive action, out of the main flow. }}
+            <div class="btn-group btn-group-sm" role="group">
+                <button type="button" class="btn btn-outline-secondary dropdown-toggle"
+                        data-bs-toggle="dropdown" aria-expanded="false"
+                        title="{{#str}}toolbar_more, local_byblos{{/str}}">
+                    <i class="fa fa-ellipsis-v"></i>
                 </button>
-            </form>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    {{^page.is_draft}}
+                    <li>
+                        <form method="post" action="{{{publishurl}}}"
+                              data-byblos-confirm="{{#str}}confirmreverttodraft, local_byblos{{/str}}">
+                            <input type="hidden" name="sesskey" value="{{sesskey}}">
+                            <input type="hidden" name="id" value="{{page.id}}">
+                            <input type="hidden" name="action" value="draft">
+                            <input type="hidden" name="returnto" value="view">
+                            <button type="submit" class="dropdown-item">
+                                <i class="fa fa-undo"></i> {{#str}}reverttodraft, local_byblos{{/str}}
+                            </button>
+                        </form>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    {{/page.is_draft}}
+                    <li>
+                        <form method="post" action="{{{deleteurl}}}"
+                              data-byblos-confirm="{{#str}}confirmdeletepage, local_byblos{{/str}}">
+                            <input type="hidden" name="sesskey" value="{{sesskey}}">
+                            <input type="hidden" name="action" value="page">
+                            <input type="hidden" name="id" value="{{page.id}}">
+                            <button type="submit" class="dropdown-item text-danger">
+                                <i class="fa fa-trash"></i> {{#str}}deletethispage, local_byblos{{/str}}
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
         </div>
         {{/isowner}}
     </div>

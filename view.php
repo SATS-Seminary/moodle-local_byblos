@@ -247,6 +247,64 @@ foreach ($shared['collections'] as $sc) {
     ];
 }
 
+// Items this user has shared with others (the "Shared by me" view): each owned
+// page or collection that carries shares, with its recipients and a revoke
+// control. Revoking reuses share.php (ownership-checked) and returns to this tab.
+$ownedshared = share::list_owned_shared_items((int) $USER->id);
+$sharereturnurl = (new moodle_url('/local/byblos/view.php', ['tab' => 'shared']))->out_as_local_url(false);
+
+$describeshare = function (\stdClass $s) use ($DB) {
+    $key = $s->sharetype;
+    if ($key === 'user') {
+        $u = $DB->get_record('user', ['id' => (int) $s->sharevalue], 'id, firstname, lastname');
+        $recipient = $u ? fullname($u) : get_string('share_user', 'local_byblos');
+    } else if ($key === 'course') {
+        $c = $DB->get_record('course', ['id' => (int) $s->sharevalue], 'id, fullname');
+        $recipient = $c ? format_string($c->fullname) : get_string('share_course', 'local_byblos');
+    } else if ($key === 'group') {
+        $g = $DB->get_record('groups', ['id' => (int) $s->sharevalue], 'id, name');
+        $recipient = $g ? format_string($g->name) : get_string('share_group', 'local_byblos');
+    } else {
+        $recipient = get_string('share_public', 'local_byblos');
+    }
+    $icons = ['user' => 'fa-user', 'course' => 'fa-graduation-cap', 'group' => 'fa-users', 'public' => 'fa-globe'];
+    return [
+        'shareid'   => (int) $s->id,
+        'recipient' => $recipient,
+        'typelabel' => get_string('share_' . $key, 'local_byblos'),
+        'icon'      => $icons[$key] ?? 'fa-share-alt',
+    ];
+};
+
+$buildownedcards = function (array $items, string $itemtype) use ($describeshare) {
+    $cards = [];
+    foreach ($items as $it) {
+        $shares = ($itemtype === 'page')
+            ? share::list_for_page((int) $it->id)
+            : share::list_for_collection((int) $it->id);
+        $recipients = array_map($describeshare, array_values($shares));
+        $viewurl = ($itemtype === 'page')
+            ? (new moodle_url('/local/byblos/page.php', ['id' => $it->id]))->out(false)
+            : (new moodle_url('/local/byblos/collection.php', ['id' => $it->id]))->out(false);
+        $cards[] = [
+            'title'         => format_string($it->title),
+            'itemid'        => (int) $it->id,
+            'itemtype'      => $itemtype,
+            'viewurl'       => $viewurl,
+            'manageurl'     => (new moodle_url(
+                '/local/byblos/share.php',
+                ['id' => $it->id, 'type' => $itemtype]
+            ))->out(false),
+            'recipients'    => $recipients,
+            'hasrecipients' => !empty($recipients),
+        ];
+    }
+    return $cards;
+};
+
+$sharedbymepages = $buildownedcards($ownedshared['pages'], 'page');
+$sharedbymecollections = $buildownedcards($ownedshared['collections'], 'collection');
+
 $data = [
     'tab_pages'       => ($tab === 'pages'),
     'tab_collections' => ($tab === 'collections'),
@@ -259,6 +317,13 @@ $data = [
     'sharedcollections'     => $sharedcollectioncards,
     'has_sharedcollections' => !empty($sharedcollectioncards),
     'has_shared'            => !empty($sharedpagecards) || !empty($sharedcollectioncards),
+    'sharedbymepages'           => $sharedbymepages,
+    'has_sharedbymepages'       => !empty($sharedbymepages),
+    'sharedbymecollections'     => $sharedbymecollections,
+    'has_sharedbymecollections' => !empty($sharedbymecollections),
+    'has_sharedbyme'            => !empty($sharedbymepages) || !empty($sharedbymecollections),
+    'sharereturnurl'            => $sharereturnurl,
+    'shareactionurl'            => (new moodle_url('/local/byblos/share.php'))->out(false),
     'reviews'         => $reviewdata,
     'has_reviews'     => !empty($reviewdata),
     'goals'           => $goaldata,

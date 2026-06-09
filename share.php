@@ -35,6 +35,7 @@ require_login();
 
 $id   = required_param('id', PARAM_INT);
 $type = required_param('type', PARAM_ALPHA); // Page or collection.
+$returnurl = optional_param('returnurl', '', PARAM_LOCALURL);
 
 $context = context_system::instance();
 require_capability('local/byblos:share', $context);
@@ -63,6 +64,9 @@ $PAGE->set_url($pageurl);
 $PAGE->set_context($context);
 $PAGE->set_title(get_string('share_manage', 'local_byblos') . ': ' . $itemtitle);
 $PAGE->set_heading(get_string('share_manage', 'local_byblos'));
+
+// After add/remove, return to the hub if a (local) return URL was supplied.
+$aftersave = ($returnurl !== '') ? new moodle_url($returnurl) : $pageurl;
 
 // Handle POST actions.
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -138,13 +142,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $event = page_shared::create($eventdata);
         $event->trigger();
 
-        redirect($pageurl, get_string('changessaved'), null, \core\output\notification::NOTIFY_SUCCESS);
+        redirect($aftersave, get_string('changessaved'), null, \core\output\notification::NOTIFY_SUCCESS);
     }
 
     if ($action === 'remove') {
         $shareid = required_param('shareid', PARAM_INT);
+        // The share must belong to the item we already verified the user owns,
+        // otherwise a share id alone could revoke a share on someone else's item.
+        $sharerec = $DB->get_record('local_byblos_share', ['id' => $shareid]);
+        $belongs = $sharerec && (
+            ($type === 'page' && (int) $sharerec->pageid === (int) $id)
+            || ($type === 'collection' && (int) $sharerec->collectionid === (int) $id)
+        );
+        if (!$belongs) {
+            throw new moodle_exception('error_invalid_share_value', 'local_byblos');
+        }
         share::delete($shareid);
-        redirect($pageurl, get_string('changessaved'), null, \core\output\notification::NOTIFY_SUCCESS);
+        redirect($aftersave, get_string('changessaved'), null, \core\output\notification::NOTIFY_SUCCESS);
     }
 }
 

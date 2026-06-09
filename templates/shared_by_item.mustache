@@ -1,0 +1,61 @@
+{{!
+    @template local_byblos/shared_by_item
+
+    One owned item (page or collection) in the dashboard "Shared by me" view: its
+    title, a "Manage sharing" link to the full share dialog, and each current
+    recipient with a revoke control. Revoking posts to share.php (which checks
+    ownership) and returns to the Sharing tab. Item-level fields come from the
+    enclosing list item; sesskey, shareactionurl and sharereturnurl are inherited
+    from the dashboard context.
+
+    @package    local_byblos
+    @copyright  2026 South African Theological Seminary
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+Example context (json):
+    {
+        "title": "My placement reflection",
+        "viewurl": "#",
+        "manageurl": "#",
+        "itemid": 12,
+        "itemtype": "page",
+        "recipients": [
+            {"shareid": 3, "recipient": "Jane Doe", "typelabel": "User", "icon": "fa-user"}
+        ],
+        "sesskey": "abc123",
+        "shareactionurl": "#",
+        "sharereturnurl": "/local/byblos/view.php?tab=shared"
+    }
+}}
+<div class="col-lg-6 mb-4">
+    <div class="card h-100">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <h5 class="card-title mb-0"><a href="{{{viewurl}}}">{{title}}</a></h5>
+                <a href="{{{manageurl}}}" class="btn btn-sm btn-outline-secondary flex-shrink-0 ml-2">
+                    <i class="fa fa-cog"></i> {{#str}}share_manage, local_byblos{{/str}}
+                </a>
+            </div>
+            <ul class="list-unstyled mb-0 byblos-share-recipients">
+                {{#recipients}}
+                <li class="d-flex justify-content-between align-items-center py-1 border-top">
+                    <span><i class="fa {{icon}}"></i> {{recipient}}
+                        <span class="badge badge-light">{{typelabel}}</span></span>
+                    <form method="post" action="{{{shareactionurl}}}" class="d-inline"
+                          data-byblos-confirm="{{#str}}share_revoke_confirm, local_byblos{{/str}}">
+                        <input type="hidden" name="sesskey" value="{{sesskey}}">
+                        <input type="hidden" name="id" value="{{itemid}}">
+                        <input type="hidden" name="type" value="{{itemtype}}">
+                        <input type="hidden" name="action" value="remove">
+                        <input type="hidden" name="shareid" value="{{shareid}}">
+                        <input type="hidden" name="returnurl" value="{{sharereturnurl}}">
+                        <button type="submit" class="btn btn-sm btn-outline-danger"
+                                title="{{#str}}share_revoke, local_byblos{{/str}}">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </form>
+                </li>
+                {{/recipients}}
+            </ul>
+        </div>
+    </div>
+</div>

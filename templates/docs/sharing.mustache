@@ -35,10 +35,25 @@
         sharing a draft shows the viewer nothing.
     </p>
 
+    <h2>The Sharing tab: manage it all in one place</h2>
+    <p>
+        Your dashboard has a <strong>{{#str}}tab_sharing, local_byblos{{/str}}</strong> tab that gathers all
+        of your sharing into one space, split into two views:
+    </p>
+    <ul class="byblos-docs-deflist">
+        <li><strong>{{#str}}nav_shared, local_byblos{{/str}}</strong>: pages and collections that other people have shared with you.</li>
+        <li><strong>{{#str}}sharing_byme, local_byblos{{/str}}</strong>: everything you have shared, listed by item with each recipient shown. Revoke any share in a click, or jump to the full sharing screen to add more.</li>
+    </ul>
+    <p>
+        To share something for the first time, use the share button on the page or collection (described
+        next). From then on it appears under <strong>{{#str}}sharing_byme, local_byblos{{/str}}</strong>, so
+        you always have one place to review who can see your work.
+    </p>
+
     <h2>Opening the share screen</h2>
     <ol class="byblos-docs-steps">
-        <li>Open the page, and click <strong>{{#str}}sharethispage, local_byblos{{/str}}</strong>; or open the collection and click <strong>{{#str}}sharethiscollection, local_byblos{{/str}}</strong>.</li>
-        <li>The sharing screen lists who already has access and lets you add more.</li>
+        <li>On a page, open the <strong>{{#str}}sharethispage, local_byblos{{/str}}</strong> menu and choose <strong>{{#str}}share_withpeople, local_byblos{{/str}}</strong>. On a collection, click <strong>{{#str}}sharethiscollection, local_byblos{{/str}}</strong>.</li>
+        <li>The sharing screen lists who already has access and lets you add more. You can also reach all of this from the <strong>{{#str}}tab_sharing, local_byblos{{/str}}</strong> tab (see above).</li>
     </ol>
 
     <figure class="byblos-docs-figure">
@@ -72,6 +87,12 @@
     </p>
 
     <h2>Revoking access</h2>
+    <p>
+        The quickest way is the <strong>{{#str}}tab_sharing, local_byblos{{/str}}</strong> tab on your
+        dashboard: open <strong>{{#str}}sharing_byme, local_byblos{{/str}}</strong>, find the recipient
+        under the item, and click <strong>{{#str}}share_revoke, local_byblos{{/str}}</strong>. You can also
+        revoke from a single item's own share screen:
+    </p>
     <ol class="byblos-docs-steps">
         <li>Open the share screen for the page or collection.</li>
         <li>In the list of existing shares, click <strong>{{#str}}share_revoke, local_byblos{{/str}}</strong> on the entry you want to remove.</li>
@@ -88,6 +109,27 @@
     <div class="byblos-docs-note">
         <strong>What viewers see.</strong> Shared viewers see the published content only, never your
         editing controls, and never your drafts. You can check this yourself with "preview as viewer".
+    </div>
+
+    <h2>Announcement link (for teachers)</h2>
+    <p>
+        If you can post announcements in a course, the <strong>{{#str}}sharethispage, local_byblos{{/str}}</strong>
+        menu on a page offers <strong>{{#str}}getannouncementlink, local_byblos{{/str}}</strong>. This builds a
+        trackable link you paste into a course announcement (or anywhere in the course). When a learner
+        clicks it, they open the page as normal, and the click is recorded against them.
+    </p>
+    <ol class="byblos-docs-steps">
+        <li>Open the page and choose <strong>{{#str}}sharethispage, local_byblos{{/str}}</strong> &rarr; <strong>{{#str}}getannouncementlink, local_byblos{{/str}}</strong>.</li>
+        <li>Pick the course the clicks should be attributed to, then copy the link.</li>
+        <li>Paste it into a course announcement. The page must be shared with those learners (for example, shared with that course) for them to open it.</li>
+    </ol>
+    <div class="byblos-docs-tip">
+        <strong>Where the clicks are logged.</strong> Each click is a standard Moodle log event,
+        <em>Announcement answer page opened</em>, recorded in the course you chose and attributed to the
+        learner who clicked. To see who has opened the page, go to that course and open
+        <strong>Reports &rarr; Logs</strong>; filter by the event name (or by the Byblos component) to list
+        each learner and the time they clicked. There is no separate Byblos report, it uses Moodle's own
+        course logs.
     </div>
 
     <h2>Inviting feedback on a page</h2>

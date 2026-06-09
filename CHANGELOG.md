@@ -5,6 +5,45 @@ All notable changes to the βyblos ePortfolio plugin will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-06-09
+
+Brings all sharing into one place. The dashboard's "Shared with me" tab becomes a
+general **Sharing** tab with two views, so learners both see what has been shared
+with them and manage what they have shared with others, without losing the share
+button on each page and collection.
+
+### Added
+- **Sharing tab** (renamed from "Shared with me") with two sub-views:
+  - **Shared with me**: pages and collections others have shared with you (as
+    before).
+  - **Shared by me**: every page or collection you have shared, listed by item
+    with each recipient (person, course, group, or public link). Revoke any
+    share in one click, or open the full share screen to add more.
+
+### Changed
+- The per-item Share buttons on pages and collections are unchanged; they remain
+  the way to start a new share, and everything you share then appears in the
+  Sharing tab for review and revocation.
+- Revoking and adding shares from the Sharing tab reuse the existing share
+  screen and return you to the tab afterwards (via a validated local return URL).
+- The page view toolbar is reorganised. The flat row of eight equally-weighted
+  buttons becomes grouped, weighted controls: an author group (Preview, Edit), a
+  single primary **Publish** action, a **Share** menu holding share-with-people /
+  announcement link / export, and a **More** overflow for revert-to-draft and the
+  destructive delete. Only the primary action is coloured, and delete is no longer
+  one stray click from edit.
+- Documentation: the Sharing guide now describes the Sharing tab as the central
+  hub and the page Share menu, the announcement link is documented (what it is
+  and where clicks are logged: the chosen course's Logs report), per-section
+  column width is documented in Building pages, and the Getting started dashboard
+  overview lists all six tabs.
+
+### Security
+- The share "remove" action now verifies that the share being revoked actually
+  belongs to the item the user owns. Previously it deleted by share id alone, so
+  a user with sharing permission could revoke a share on another person's item by
+  supplying its id. Revocation is now bound to an owned page or collection.
+
 ## [1.3.0] - 2026-06-09
 
 A curation-and-sharing release. The artefact library becomes searchable and
